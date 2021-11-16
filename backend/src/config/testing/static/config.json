@@ -8,7 +8,8 @@
         "testingParams": {
           "r": 100,
           "minT": 8,
-          "maxT": 256
+          "maxT": 256,
+          "forceDifferentUsers": true
         },
         "globalParams": {
           "points": []

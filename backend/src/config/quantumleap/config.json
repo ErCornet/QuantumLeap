@@ -3,7 +3,7 @@
     "settings": {
       "general": {
         "general": {
-          "debug": false,
+          "debug": true,
           "sendContinuousData": true
         },
         "server": {
@@ -14,12 +14,12 @@
       "sensors": {
         "modules": [
           {
-            "uuid": "49dbb1a4-3ff0-4820-b812-e6814d64dff3",
-            "moduleName": "leap-sensor",
+            "uuid": "b3e7b8a9-0375-4d13-8a36-31b722865df4",
+            "moduleName": "myo-armband",
             "moduleType": "sensors",
             "moduleSettings": {},
             "additionalSettings": {
-              "id": "lmc"
+              "id": "Myo"
             }
           }
         ],

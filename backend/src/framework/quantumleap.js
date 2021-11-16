@@ -50,20 +50,25 @@ function setupWSS(config, server) {
       if (config.general.general.debug) {
         console.log(message);
       }
-      var msg = JSON.parse(message);
-      if (msg.type === 'operation') {
-        for (const operation of msg.data) {
-          if (operation.type === 'addPose') {
-            frameProcessor.enableGesture('static', operation.name);
-          } else if (operation.type === 'addGesture') {
-            frameProcessor.enableGesture('dynamic', operation.name);
-          } else if (operation.type === 'removePose') {
-            frameProcessor.disableGesture('static', operation.name);
-          } else if (operation.type === 'removeGesture') {
-            frameProcessor.disableGesture('dynamic', operation.name);
+
+      try
+      {
+        var msg = JSON.parse(message);
+
+        if (msg.type === 'operation') {
+          for (const operation of msg.data) {
+            if (operation.type === 'addPose') {
+              frameProcessor.enableGesture('static', operation.name);
+            } else if (operation.type === 'addGesture') {
+              frameProcessor.enableGesture('dynamic', operation.name);
+            } else if (operation.type === 'removePose') {
+              frameProcessor.disableGesture('static', operation.name);
+            } else if (operation.type === 'removeGesture') {
+              frameProcessor.disableGesture('dynamic', operation.name);
+            }
           }
         }
-      }
+      } catch(e) {}
     });
     // Stop previous sensor loop (if any) TODO In the future, find a better solution
     sensor.stop();

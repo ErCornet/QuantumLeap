@@ -1,0 +1,24 @@
+{
+  "label": "Myo Armband",
+  "name": "myo-armband",
+  "type": "sensor",
+  "description": "An adaptation layer for the Myo Armband Controller.",
+  "display": true,
+  "properties": {
+    "points": [
+      {
+        "type": "category",
+        "name": "left",
+        "label": "Left",
+        "points": [
+          {
+            "type": "joint",
+            "name": "leftPalmPosition",
+            "label": "Palm"
+          }
+        ]
+      }
+    ]
+  },
+  "settings": []
+}
