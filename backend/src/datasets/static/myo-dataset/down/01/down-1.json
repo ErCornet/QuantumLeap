@@ -1,0 +1,46 @@
+{
+	"frames":10,
+	"data":
+	[
+		{
+			"id":0,
+			"acceleration": [0,0,-0.50]
+		},
+		{
+			"id":1,
+			"acceleration": [0,0,-0.55]
+		},
+		{
+			"id":2,
+			"acceleration": [0,0,-0.60]
+		},
+		{
+			"id":3,
+			"acceleration": [0,0,-0.65]
+		},
+		{
+			"id":4,
+			"acceleration": [0,0,-0.70]
+		},
+		{
+			"id":5,
+			"acceleration": [0,0,-0.75]
+		},
+		{
+			"id":6,
+			"acceleration": [0,0,-0.80]
+		},
+		{
+			"id":7,
+			"acceleration": [0,0,-0.85]
+		},
+		{
+			"id":8,
+			"acceleration": [0,0,-0.90]
+		},
+		{
+			"id":9,
+			"acceleration": [0,0,-0.95]
+		}
+	]
+}

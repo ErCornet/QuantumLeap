@@ -15,15 +15,27 @@ class Recognizer {
     }
     var t0 = performance.now();
     var candidate = new CPS("", points, this.alpha);
+
+    console.log(points);
+    console.log(candidate);
+    console.log(this.templates);
+    
+
     var bestTemplate = null;
     var bestDistance = +Infinity;
     for (const template of this.templates) {
       var distance = computeGPSD(candidate.cps, template.cps);
+      
+      //console.log({c:candidate, t:template, d:distance});
+
       if (distance < bestDistance) {
         bestTemplate = template;
         bestDistance = distance;
       }
     }
+
+    while(true){}
+
     var t1 = performance.now();
     let score = bestDistance > 1.0 ? 1.0 / bestDistance : 1.0;
     return (bestTemplate === null) ? { success: false, name: 'No match', score: 0.0, time: t1 - t0 } : { success: true, name: bestTemplate.name, score: score, time: t1 - t0 };
@@ -48,6 +60,7 @@ class Recognizer {
 class CPS {
   constructor(name, points, alpha) {
     this.name = name;
+    console.log(name);
     this.cps = computeCPS(points, alpha);
   }
 }
@@ -87,6 +100,13 @@ function computeCPS(points, alpha) {
       cps.push(alphaDistance / avgDistance);
     }
   }
+
+  console.log(points);
+  console.log(alpha);
+  console.log(barycentre);
+  console.log(avgDistance);
+  console.log(cps);
+
   cps.sort();
   return cps;
 }

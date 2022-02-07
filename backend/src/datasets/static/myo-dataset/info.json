@@ -1,0 +1,10 @@
+{
+  "label": "Myo Armband dataset (static)",
+  "name": "myo-dataset",
+  "description": "A simple dataset",
+  "gestures": [
+    "up",
+    "down",
+    "rest"
+  ]
+}

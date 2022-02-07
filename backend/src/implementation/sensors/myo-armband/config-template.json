@@ -7,16 +7,24 @@
   "properties": {
     "points": [
       {
-        "type": "category",
-        "name": "left",
-        "label": "Left",
-        "points": [
-          {
-            "type": "joint",
-            "name": "leftPalmPosition",
-            "label": "Palm"
-          }
-        ]
+        "type": "joint",
+        "name": "Origin",
+        "label": "Origin"
+      },
+      {
+        "type": "joint",
+        "name": "Origin2",
+        "label": "Origin"
+      },
+      {
+        "type": "joint",
+        "name": "Acceleration",
+        "label": "Acceleration"
+      },
+      {
+        "type": "joint",
+        "name": "Rotation",
+        "label": "Rotation"
       }
     ]
   },
