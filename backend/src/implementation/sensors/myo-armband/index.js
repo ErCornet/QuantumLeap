@@ -1,85 +1,98 @@
 const AbstractSensor = require('../../../framework/modules/sensors/abstract-sensor').AbstractSensor
-const Point = require('../../../framework/gestures/point').Point3D;
+const Point3D = require('../../../framework/gestures/point').Point3D;
 const WebSocket = require('ws');
-// const MyoGestureHandler = require('myo-module')
 
-// MyoGestureHandler.register();
-
-class Sensor extends AbstractSensor {
-  constructor(options) {
+class Sensor extends AbstractSensor 
+{
+  constructor(options) 
+  {
     super("Myo Armband Interface");
 
     this.socket = undefined;
-    this.lastFrame = undefined;
-    // TODO remove
-    this.timestamp = 0;
+    this.lastPoints = [];
+    this.hasData = false;
   }
 
-  getPoints(timestamp) {
-    let frame = this.lastFrame;
+  getPoints(timestamp) 
+  {
+    let hasData = this.hasData;
+    this.hasData = false;
+    
+    return { hasData: hasData, points: this.lastPoints, appData: undefined};
+  }
 
-    // TODO remove
-    this.timestamp += 1;
+  parseFrame(frame)
+  {
+    //console.log(frame);
 
     let points = []
+
     points.push({
       name: "Origin",
-      point: new Point(0, 0, 2, this.timestamp)
+      point: new Point3D(0, 0, -1, undefined)
     });
 
     points.push({
       name: "Origin2",
-      point: new Point(0, 2, 0, this.timestamp)
+      point: new Point3D(0, 0, 1, undefined)
     });
 
+    // TODO
     points.push({
       name: "Acceleration",
-      point: new Point(0, 0, 0, this.timestamp)
+      point: new Point3D(0, 0, 0, undefined)
     });
 
+    // TODO
     points.push({
       name: "Rotation",
-      point: new Point(0, 0, 0, this.timestamp)
+      point: new Point3D(0, 0, 0, undefined)
     });
+
+    for(let i = 0; i < 8; i++)
+    {
+        let a = 2 * Math.PI * (i / 8);
+        let m = 1 + (frame.EMG_smth[i] / 128);
+
+        points.push({
+          name: "EMG" + i,
+          point: new Point3D(m * Math.sin(a), m * Math.cos(a), 0, undefined)
+        });
+    }
 
     //console.log(points);
 
-    return { hasData: true, points: points, appData: undefined};
-    //return { hasData: false, points: [], appData: undefined};
+    this.lastPoints = points;
+    this.hasData = true;  
   }
 
-  connect() {
+  connect() 
+  {
     // Create WebSocket connection.
     this.socket = new WebSocket("ws://localhost:6450");
 
     // Open Connection
-    // this.socket.addEventListener('open', function (event) {
-    //     this.socket.send(JSON.stringify({background: true}))
-    // });
+    this.socket.addEventListener('open', function (event) {
+        //this.socket.send(JSON.stringify({background: true}))
+    });
 
     // Listen for messages
-    this.socket.addEventListener('message', function (event) {
-      try 
-      { 
-        //console.log(event.data)
-        let data = JSON.parse(event.data);
-        //console.log(data)
-        this.lastFrame = data;
-      } catch(e) {}     
-    });
+    this.socket.addEventListener('message', (event) => this.parseFrame(JSON.parse(event.data)));
 
     // Handle errors
     this.socket.addEventListener('error', function(event) {
-      //console.error("WebSocket error observed:", event);
+      console.error("WebSocket error observed:", event);
     });
   }
 
-  disconnect() {
+  disconnect() 
+  {
     // Disconnect
     if (this.socket) {
       this.socket.close();
       this.socket = undefined;
-      this.lastFrame = undefined;
+      this.lastPoints = [];
+      this.hasData = false;
     }
   }
 }

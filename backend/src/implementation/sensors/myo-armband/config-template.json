@@ -25,6 +25,54 @@
         "type": "joint",
         "name": "Rotation",
         "label": "Rotation"
+      },
+      {
+        "type": "category",
+        "name": "EMG",
+        "label": "EMG",
+        "points": 
+        [
+          {
+            "type": "joint",
+            "name": "EMG0",
+            "label": "EMG0"
+          },
+          {
+            "type": "joint",
+            "name": "EMG1",
+            "label": "EMG1"
+          },
+          {
+            "type": "joint",
+            "name": "EMG2",
+            "label": "EMG2"
+          },
+          {
+            "type": "joint",
+            "name": "EMG3",
+            "label": "EMG3"
+          },
+          {
+            "type": "joint",
+            "name": "EMG4",
+            "label": "EMG4"
+          },
+          {
+            "type": "joint",
+            "name": "EMG5",
+            "label": "EMG5"
+          },
+          {
+            "type": "joint",
+            "name": "EMG6",
+            "label": "EMG6"
+          },
+          {
+            "type": "joint",
+            "name": "EMG7",
+            "label": "EMG7"
+          }
+        ]
       }
     ]
   },

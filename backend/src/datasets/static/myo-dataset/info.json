@@ -3,8 +3,7 @@
   "name": "myo-dataset",
   "description": "A simple dataset",
   "gestures": [
-    "up",
-    "down",
-    "rest"
+    "rest",
+    "fist"
   ]
 }

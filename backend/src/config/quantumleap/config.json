@@ -44,7 +44,7 @@
               }
             }
           ],
-          "templatesPerClass": 10,
+          "templatesPerClass": 500,
           "aggregateClasses": []
         },
         "dynamic": {
@@ -83,14 +83,21 @@
         "static": {
           "modules": [
             {
-              "uuid": "f8f624d2-6f35-4041-ae0b-b03010592eb9",
-              "moduleName": "gpsd",
+              "uuid": "71be31bd-43de-4be9-a6de-67f6f8b40a6e",
+              "moduleName": "p3dollarplus",
               "moduleType": "recognizers/static",
               "moduleSettings": {
                 "points": {
                   "Myo": [
                     "Origin",
-                    "Acceleration",
+                    "EMG0",
+                    "EMG1",
+                    "EMG2",
+                    "EMG3",
+                    "EMG4",
+                    "EMG5",
+                    "EMG6",
+                    "EMG7",
                     "Origin2"
                   ]
                 }
@@ -98,7 +105,7 @@
               "additionalSettings": {}
             }
           ],
-          "scoreThreshold": 0.3,
+          "scoreThreshold": 0.1,
           "bufferLength": 15,
           "poseRatioThreshold": 0.8,
           "sendIfRequested": false,

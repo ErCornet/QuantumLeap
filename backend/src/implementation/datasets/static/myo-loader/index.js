@@ -39,17 +39,29 @@ function parseFrame(frame, identifier) {
     let parsedFrame = new Frame(frame.id);
     //parsedFrame.hasData = true;
 
-    let oriArticulation = new Articulation(makeIdentifier(`Origin`, identifier), new Point3D(0, 0, 2, undefined));
+    let oriArticulation = new Articulation(makeIdentifier(`Origin`, identifier), new Point3D(0, 0, -1, undefined));
     parsedFrame.addArticulation(oriArticulation);
-    let oriArticulation2 = new Articulation(makeIdentifier(`Origin2`, identifier), new Point3D(0, 2, 0, undefined));
+    let oriArticulation2 = new Articulation(makeIdentifier(`Origin2`, identifier), new Point3D(0, 0, 1, undefined));
     parsedFrame.addArticulation(oriArticulation2);
 
-    let accArticulation = new Articulation(makeIdentifier(`Acceleration`, identifier), new Point3D(frame.acceleration[0], frame.acceleration[1], frame.acceleration[2], undefined));
-    parsedFrame.addArticulation(accArticulation);
+    let Acceleration = new Articulation(makeIdentifier(`Acceleration`, identifier), new Point3D(0, 0, 0, undefined));
+    parsedFrame.addArticulation(Acceleration);
 
-    //
-    let rotArticulation = new Articulation(makeIdentifier(`Rotation`, identifier), new Point3D(0, 0, 0, undefined));
-    parsedFrame.addArticulation(rotArticulation);
+    let Rotation = new Articulation(makeIdentifier(`Rotation`, identifier), new Point3D(0, 0, 0, undefined));
+    parsedFrame.addArticulation(Rotation);
+
+    for(let i = 0; i < 8; i++)
+    {
+        let a = 2 * Math.PI * (i / 8);
+        let m = 1 + (frame.EMG_smth[i] / 128);
+        let EMG_i = new Articulation(makeIdentifier(`EMG` + i, identifier), new Point3D(m * Math.sin(a), m * Math.cos(a), 0, undefined));
+
+        parsedFrame.addArticulation(EMG_i);
+    }
+
+    //console.log(parsedFrame);
+    //console.log(frame);
+    //while(true) {}
 
     return parsedFrame;
 }
