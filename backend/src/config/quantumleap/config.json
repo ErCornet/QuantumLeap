@@ -44,7 +44,7 @@
               }
             }
           ],
-          "templatesPerClass": 500,
+          "templatesPerClass": 1000,
           "aggregateClasses": []
         },
         "dynamic": {
@@ -105,7 +105,7 @@
               "additionalSettings": {}
             }
           ],
-          "scoreThreshold": 0.1,
+          "scoreThreshold": 0.6,
           "bufferLength": 15,
           "poseRatioThreshold": 0.8,
           "sendIfRequested": false,
