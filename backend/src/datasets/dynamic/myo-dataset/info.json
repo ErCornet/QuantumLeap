@@ -1,7 +1,0 @@
-{
-  "label": "Myo Armband dataset (dynamic)",
-  "name": "myo-dataset",
-  "description": "A simple dataset",
-  "gestures": [
-  ]
-}
