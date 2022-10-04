@@ -12,7 +12,17 @@
         }
       },
       "sensors": {
-        "modules": [],
+        "modules": [
+          {
+            "uuid": "7b385e70-074e-402e-b158-3195b793d1ad",
+            "moduleName": "myo-sensor",
+            "moduleType": "sensors",
+            "moduleSettings": {},
+            "additionalSettings": {
+              "id": "myo-sensor"
+            }
+          }
+        ],
         "framerate": 60
       },
       "filters": {
@@ -34,7 +44,40 @@
         "modules": []
       },
       "segmenters": {
-        "modules": []
+        "modules": [
+          {
+            "uuid": "b2f03033-5b23-4cdd-8f94-09b64c6c5ba8",
+            "moduleName": "window",
+            "moduleType": "segmenters",
+            "moduleSettings": {
+              "windows": [
+                {
+                  "width": 20,
+                  "uuid": "4e9b510e-73e9-4b5f-bf60-5b6428f23ed0"
+                }
+              ],
+              "intervalLength": 3,
+              "pauseLength": 60
+            },
+            "additionalSettings": {
+              "motionThreshold": 70,
+              "motionArticulations": {
+                "myo-sensor": [
+                  "Acceleration",
+                  "Rotation",
+                  "EMG0",
+                  "EMG1",
+                  "EMG2",
+                  "EMG3",
+                  "EMG4",
+                  "EMG5",
+                  "EMG6",
+                  "EMG7"
+                ]
+              }
+            }
+          }
+        ]
       },
       "recognizers": {
         "static": {

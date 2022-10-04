@@ -7,16 +7,6 @@
     "points": [
       {
         "type": "joint",
-        "name": "Origin",
-        "label": "Origin"
-      },
-      {
-        "type": "joint",
-        "name": "Origin2",
-        "label": "Origin"
-      },
-      {
-        "type": "joint",
         "name": "Acceleration",
         "label": "Acceleration"
       },
