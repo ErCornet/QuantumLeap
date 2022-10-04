@@ -7,9 +7,10 @@
         },
         "testingParams": {
           "r": 100,
-          "minT": 8,
-          "maxT": 256,
-          "forceDifferentUsers": true
+          "minT": 1,
+          "maxT": 8,
+          "userDependent": true,
+          "userIndependent": true
         },
         "globalParams": {
           "points": []

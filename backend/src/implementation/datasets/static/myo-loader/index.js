@@ -5,15 +5,19 @@ const GestureSet = require('../../../../framework/gestures/gesture-set').Gesture
 const GestureClass = require('../../../../framework/gestures/gesture-class').GestureClass;
 const PoseData = require('../../../../framework/gestures/pose-data').PoseData;
 const { Frame, Articulation } = require('../../../../framework/frames/frame');
-const Point3D = require('../../../../framework/gestures/point').Point3D;
+const Point = require('../../../../framework/gestures/point').Point3D;
 
-function loadDataset(name, datasetPath, identifier, sensorPointsNames) {
+const fingerNames = ["Thumb", "Index", "Middle", "Ring", "Pinky"];
+const fingerArticulations = ["Mcp", "Pip", "Tip"];
+
+function loadDataset(name, datasetPath, sensorId, datasetId, sensorPointsNames) {
     let gestureSet = new GestureSet(name);
     let dirPath = datasetPath;
     let gestureIndex = 0;
     fs.readdirSync(dirPath, { withFileTypes: true }).filter(dirent => !dirent.isFile()).map(dirent => dirent.name).forEach((gesture) => {
         let gestureDirPath = path.join(dirPath, gesture);
-        let gestureClass = new GestureClass(gesture, gestureIndex);
+        let gestureName = addIdentifier(gesture, datasetId);
+        let gestureClass = new GestureClass(gestureName, gestureIndex);
         gestureSet.addGestureClass(gestureClass);
         fs.readdirSync(gestureDirPath).forEach((user) => {
             let userDirPath = path.join(gestureDirPath, user);
@@ -22,7 +26,7 @@ function loadDataset(name, datasetPath, identifier, sensorPointsNames) {
                 let parsedFile = JSON.parse(fs.readFileSync(rawGesturePath));
                 let id = 0;
                 for (const frame of parsedFile.data) {
-                    let parsedFrame = parseFrame(frame, identifier);
+                    let parsedFrame = parseFrame(frame, sensorId);
                     let poseData = new PoseData(parseInt(user), id, parsedFrame, undefined);
                     gestureClass.addSample(poseData);
                     id++;
@@ -31,42 +35,40 @@ function loadDataset(name, datasetPath, identifier, sensorPointsNames) {
         });
         gestureIndex += 1;
     });
-
     return gestureSet;
 }
 
-function parseFrame(frame, identifier) {
+function parseFrame(frame, sensorId) {
     let parsedFrame = new Frame(frame.id);
-    //parsedFrame.hasData = true;
-
-    let oriArticulation = new Articulation(makeIdentifier(`Origin`, identifier), new Point3D(0, 0, -1, undefined));
-    parsedFrame.addArticulation(oriArticulation);
-    let oriArticulation2 = new Articulation(makeIdentifier(`Origin2`, identifier), new Point3D(0, 0, 1, undefined));
-    parsedFrame.addArticulation(oriArticulation2);
-
-    let Acceleration = new Articulation(makeIdentifier(`Acceleration`, identifier), new Point3D(0, 0, 0, undefined));
-    parsedFrame.addArticulation(Acceleration);
-
-    let Rotation = new Articulation(makeIdentifier(`Rotation`, identifier), new Point3D(0, 0, 0, undefined));
-    parsedFrame.addArticulation(Rotation);
-
-    for(let i = 0; i < 8; i++)
-    {
-        let a = 2 * Math.PI * (i / 8);
-        let m = 1 + (frame.EMG_smth[i] / 128);
-        let EMG_i = new Articulation(makeIdentifier(`EMG` + i, identifier), new Point3D(m * Math.sin(a), m * Math.cos(a), 0, undefined));
-
-        parsedFrame.addArticulation(EMG_i);
+    let rightHandId = -1;
+    // Add palms
+    for (const hand of frame.hands) {
+        // Save id of right hand
+        if (hand.type === "right") {
+            rightHandId = hand.id;
+        }
+        let label = addIdentifier(`${hand.type}PalmPosition`, sensorId);
+        let position = new Point(...hand.palmPosition);
+        let articulation = new Articulation(label, position);
+        parsedFrame.addArticulation(articulation);
     }
-
-    //console.log(parsedFrame);
-    //console.log(frame);
-    //while(true) {}
-
+    // Add fingers
+    for (const pointable of frame.pointables) {
+        if (!pointable.tool) {
+            for (const fingerArticulation of fingerArticulations) {
+                // Get label (e.g., rightIndexPipPosition)
+                let side = pointable.handId == rightHandId ? "right" : "left";
+                let label = addIdentifier(`${side}${fingerNames[pointable.type]}${fingerArticulation}Position`, sensorId);
+                let position = new Point(...pointable[`${fingerArticulation.toLowerCase()}Position`]);
+                let articulation = new Articulation(label, position);
+                parsedFrame.addArticulation(articulation);
+            }
+        }
+    }
     return parsedFrame;
 }
 
-function makeIdentifier(name, identifier) {
+function addIdentifier(name, identifier) {
     return identifier ? `${name}_${identifier}` : name;
 }
 

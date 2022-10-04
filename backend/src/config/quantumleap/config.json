@@ -3,8 +3,8 @@
     "settings": {
       "general": {
         "general": {
-          "debug": false,
-          "sendContinuousData": false
+          "debug": true,
+          "sendContinuousData": true
         },
         "server": {
           "ip": "127.0.0.1",
@@ -14,47 +14,119 @@
       "sensors": {
         "modules": [
           {
-            "uuid": "b3e7b8a9-0375-4d13-8a36-31b722865df4",
-            "moduleName": "myo-armband",
+            "uuid": "f58cb892-0f24-4d6a-9188-e4c97155a4ac",
+            "moduleName": "leap-sensor",
             "moduleType": "sensors",
             "moduleSettings": {},
             "additionalSettings": {
-              "id": "Myo"
+              "id": "lmc"
             }
           }
         ],
         "framerate": 60
       },
       "filters": {
-        "modules": []
+        "modules": [
+          {
+            "uuid": "3af13a9c-899f-4e9c-9514-f6c3bb944eab",
+            "moduleName": "moving-window",
+            "moduleType": "filters",
+            "moduleSettings": {
+              "type": "average",
+              "windowSize": 10
+            },
+            "additionalSettings": {}
+          }
+        ]
       },
       "datasets": {
         "static": {
           "modules": [
             {
-              "uuid": "8604423e-216f-40d4-93a1-1ee51a23b0c4",
-              "moduleName": "myo-loader",
+              "uuid": "5f9a3573-ac9d-4996-8b8a-d155da8bc34f",
+              "moduleName": "leap-loader",
               "moduleType": "datasets/static",
               "moduleSettings": {},
               "additionalSettings": {
                 "datasets": [
-                  "myo-dataset"
+                  "guinevre-static2"
                 ],
-                "id": "Myo"
+                "sensorId": "lmc",
+                "datasetId": ""
               }
             }
           ],
-          "templatesPerClass": 1000,
+          "templatesPerClass": 400,
           "aggregateClasses": []
         },
         "dynamic": {
-          "modules": [],
+          "modules": [
+            {
+              "uuid": "a79054f0-4bd7-418f-b28e-c6c1b144e4a5",
+              "moduleName": "leap-loader",
+              "moduleType": "datasets/dynamic",
+              "moduleSettings": {},
+              "additionalSettings": {
+                "datasets": [
+                  "guinevere"
+                ],
+                "sensorId": "lmc",
+                "datasetId": ""
+              }
+            }
+          ],
           "templatesPerClass": 8,
-          "aggregateClasses": []
+          "aggregateClasses": [
+            {
+              "uuid": "f92868b5-27d0-4cb4-a0e1-13096c5da2f8",
+              "name": "rhand_uswipe",
+              "gestureClasses": [
+                "swipe_up"
+              ]
+            },
+            {
+              "uuid": "9747032b-4b52-4a31-9c2a-7c576e432fad",
+              "name": "rindex_airtap",
+              "gestureClasses": [
+                "tap"
+              ]
+            },
+            {
+              "uuid": "42e4d32f-5550-43f7-86c7-a87f0eeaf91b",
+              "name": "rhand_lswipe",
+              "gestureClasses": [
+                "swipe_left"
+              ]
+            },
+            {
+              "uuid": "2c9acf9a-775d-4322-a5ff-5b14bd884afa",
+              "name": "rhand_rswipe",
+              "gestureClasses": [
+                "swipe_right"
+              ]
+            },
+            {
+              "uuid": "7c9f217b-6eeb-409d-9e2c-b255d5861730",
+              "name": "rhand_dswipe",
+              "gestureClasses": [
+                "swipe_down"
+              ]
+            }
+          ]
         }
       },
       "analyzers": {
-        "modules": []
+        "modules": [
+          {
+            "uuid": "79922010-4318-4ab8-9d14-dd8079514ebe",
+            "moduleName": "basic",
+            "moduleType": "analyzers",
+            "moduleSettings": {
+              "leftHanded": false
+            },
+            "additionalSettings": {}
+          }
+        ]
       },
       "segmenters": {
         "modules": [
@@ -74,7 +146,11 @@
             },
             "additionalSettings": {
               "motionThreshold": 70,
-              "motionArticulations": {}
+              "motionArticulations": {
+                "lmc": [
+                  "rightPalmPosition"
+                ]
+              }
             }
           }
         ]
@@ -83,36 +159,62 @@
         "static": {
           "modules": [
             {
-              "uuid": "71be31bd-43de-4be9-a6de-67f6f8b40a6e",
-              "moduleName": "p3dollarplus",
+              "uuid": "e146006a-90dd-4f2c-9548-11ce8c83e701",
+              "moduleName": "gpsda",
               "moduleType": "recognizers/static",
               "moduleSettings": {
+                "alpha": 0.7,
                 "points": {
-                  "Myo": [
-                    "Origin",
-                    "EMG0",
-                    "EMG1",
-                    "EMG2",
-                    "EMG3",
-                    "EMG4",
-                    "EMG5",
-                    "EMG6",
-                    "EMG7",
-                    "Origin2"
+                  "lmc": [
+                    "rightPalmPosition",
+                    "rightThumbTipPosition",
+                    "rightIndexTipPosition",
+                    "rightMiddleTipPosition",
+                    "rightRingTipPosition",
+                    "rightPinkyTipPosition",
+                    "rightThumbPipPosition",
+                    "rightIndexPipPosition",
+                    "rightMiddlePipPosition",
+                    "rightRingPipPosition",
+                    "rightPinkyPipPosition",
+                    "rightThumbMcpPosition",
+                    "rightIndexMcpPosition",
+                    "rightMiddleMcpPosition",
+                    "rightRingMcpPosition",
+                    "rightPinkyMcpPosition"
                   ]
                 }
               },
-              "additionalSettings": {}
+              "additionalSettings": {
+                "trainingGestures": []
+              }
             }
           ],
-          "scoreThreshold": 0.6,
+          "scoreThreshold": 0.3,
           "bufferLength": 15,
           "poseRatioThreshold": 0.8,
-          "sendIfRequested": false,
+          "sendIfRequested": true,
           "loadOnRequest": false
         },
         "dynamic": {
-          "modules": [],
+          "modules": [
+            {
+              "uuid": "c8c0acdb-489d-4c4b-9f93-f8e306005449",
+              "moduleName": "jackknife",
+              "moduleType": "recognizers/dynamic",
+              "moduleSettings": {
+                "samplingPoints": 16,
+                "points": {
+                  "lmc": [
+                    "rightPalmPosition"
+                  ]
+                }
+              },
+              "additionalSettings": {
+                "trainingGestures": []
+              }
+            }
+          ],
           "scoreThreshold": 0.035,
           "sendIfRequested": true,
           "loadOnRequest": false

@@ -3,18 +3,20 @@ const fs = require('fs');
 const GestureSet = require('./gestures/gesture-set').GestureSet;
 const GestureClass = require('./gestures/gesture-class').GestureClass;
 const stringify = require("json-stringify-pretty-compact");
+const { performance } = require('perf_hooks');
+const LogHelper = require('./log-helper');
 
 // Important values
 const computeNextT = x => x * 2; // Function that computes the next number of training templates
 
 class Testing {
   constructor(recognizerType, config) {
+    this.testingType = '';
     this.recognizerType = recognizerType;
     // Get datasets and recognizers
     this.datasets = config.datasets[recognizerType];
     this.recognizers = config.recognizers[recognizerType];
     // Get testing parameters
-    this.forceDifferentUsers = config.general.testingParams.forceDifferentUsers;
     this.minT = config.general.testingParams.minT;
     this.maxT = config.general.testingParams.maxT;
     this.r = config.general.testingParams.r;
@@ -24,7 +26,8 @@ class Testing {
   }
 
   run() {
-    console.log('Starting testing')
+    LogHelper.log('info', `Starting testing (${this.testingType})`);
+    let t0 = performance.now();
     let results = [];
     for (let i = 0; i < this.datasets.modules.length; i++) {
       let dataset = loadDataset(this.recognizerType, this.datasets);
@@ -36,19 +39,28 @@ class Testing {
       };
       for (let j = 0; j < this.recognizers.modules.length; j++) {
         let recognizerModule = this.recognizers.modules[j];
-        let res = this.testRecognizer(dataset, recognizerModule);
-        console.log(recognizerModule.module.name);
+        // Callback to display the progress of the testing to the user
+        let printProgress = (recognizerProgress) => {
+          let I = this.datasets.modules.length;
+          let J = this.recognizers.modules.length
+          let progress = 100 * (i/I + j/(I*J) + recognizerProgress/(I*J));
+          let t1 = performance.now();
+          let elapsedTime = t1 - t0;
+          let remainingTime =  (elapsedTime / progress) * (100 - progress);
+          process.stdout.write(`Progress - ${progress.toFixed(1)}% (${getTimeStr(remainingTime)} remaining)                      \r`);
+        }
+        let res = this.testRecognizer(dataset, recognizerModule, printProgress);
         datasetResults.data.push({
           name: recognizerModule.module.name,
           options: recognizerModule.moduleSettings,
           data: res
         });
       }
-      console.log(datasetResults)
+      // console.log('\n', datasetResults);
       results.push(datasetResults);
     }
-    console.log('Ending Testing')
-    fs.writeFileSync(`results-${this.recognizerType}.json`, stringify(results, {maxLength: 150, indend: 2}));
+    LogHelper.log('info', `Ending Testing (${this.testingType})`);
+    fs.writeFileSync(`results-${this.recognizerType}-${this.testingType}.json`, stringify(results, {maxLength: 150, indend: 2}));
   }
 
   testRecognizer(dataset, recognizerModule) {
@@ -59,12 +71,43 @@ class Testing {
 class UserIndependentTesting extends Testing {
   constructor(recognizerType, config) {
     super(recognizerType, config);
+    this.testingType = 'UI';
   }
 
-  testRecognizer(dataset, recognizerModule) {
+  testRecognizer(dataset, recognizerModule, printProgress) {
     let results = [];
+
+    // Compute the maximum number of training templates per gesture class
+    let maxTrainingSetSize = Infinity;
+    dataset.getGestureClasses().forEach((gestureClass) => {
+      let nTemplatesPerUser = new Map();
+      gestureClass.getSamples().forEach((sample) => {
+        if (nTemplatesPerUser.has(sample.user)) {
+          nTemplatesPerUser.set(sample.user, nTemplatesPerUser.get(sample.user) + 1);
+        } else {
+          nTemplatesPerUser.set(sample.user, 1);
+        }
+      });
+      let maxTemplatesPerUser = -Infinity;
+      nTemplatesPerUser.forEach((nTemplates) => {
+        maxTemplatesPerUser = Math.max(maxTemplatesPerUser, nTemplates);
+      });
+      maxTrainingSetSize = Math.min(maxTrainingSetSize, gestureClass.TperG - maxTemplatesPerUser);
+    });
+    maxTrainingSetSize = Math.min(maxTrainingSetSize, this.maxT);
+    if (maxTrainingSetSize != this.maxT) {
+      LogHelper.log('warn', `The configured value for maximum number of training templates (T = ${this.maxT}) is too large! The maximum supported value for this gesture set (UI testing) is T = ${maxTrainingSetSize}.`)
+    }
+
+    // Compute training set sizes
+    let trainingSetSizes = [];
+    for (let trainingSetSize = Math.max(1, this.minT); trainingSetSize <= maxTrainingSetSize; trainingSetSize = computeNextT(trainingSetSize)) {
+      trainingSetSizes.push(trainingSetSize);
+    }
+
     // Perform the test for each size of training set
-    for (let trainingSetSize = this.minT; trainingSetSize <= Math.min(dataset.getMinTemplate(), this.maxT); trainingSetSize = computeNextT(trainingSetSize)) {
+    for (let i = 0; i < trainingSetSizes.length; i++) {
+      let trainingSetSize = trainingSetSizes[i];
       let res = {
         n: trainingSetSize,
         accuracy: 0.0,
@@ -87,20 +130,13 @@ class UserIndependentTesting extends Testing {
         for (let t = 0; t < trainingSetSize; t++) { // Add trainingSetSize strokeData per gestureClass
           // Add one sample for each gesture class
           let index = 0;
+          
           dataset.getGestureClasses().forEach((gestureClass) => {
             // Select a valid training template
             let training = -1;
-
-            if (this.forceDifferentUsers) {
-              while (training == -1 || markedTemplates[index].includes(training) || gestureClass.getSamples()[training].user == gestureClass.getSamples()[markedTemplates[index][0]].user) {
-                training = getRandomNumber(0, gestureClass.getSamples().length);
-              }
-            } else {
-              while (training == -1 || markedTemplates[index].includes(training)) {
-                training = getRandomNumber(0, gestureClass.getSamples().length);
-              }
+            while (training == -1 || markedTemplates[index].includes(training) || gestureClass.getSamples()[training].user === gestureClass.getSamples()[markedTemplates[index][0]].user) {
+              training = getRandomNumber(0, gestureClass.getSamples().length);
             }
-
             // Mark the training template
             markedTemplates[index].push(training);
             // Train the recognizer
@@ -129,6 +165,9 @@ class UserIndependentTesting extends Testing {
           res.time += result.time;
           index++;
         });
+        // Compute and print progress
+        let progress = i / trainingSetSizes.length + r / (this.r * trainingSetSizes.length);
+        printProgress(progress);
       }
       res.accuracy = res.accuracy / (this.r * dataset.G);
       res.time = res.time / (this.r * dataset.G);
@@ -141,15 +180,138 @@ class UserIndependentTesting extends Testing {
 class UserDependentTesting extends Testing {
   constructor(recognizerType, config) {
     super(recognizerType, config);
+    this.testingType = 'UD';
   }
 
-  testRecognizer(dataset, recognizerModule) {
-    super.testRecognizer(dataset, recognizerModule);
+  testRecognizer(dataset, recognizerModule, printProgress) {
+    let results = [];
+
+    // Compute the maximum number of training templates per gesture class
+    let maxTrainingSetSize = Infinity;
+    dataset.getGestureClasses().forEach((gestureClass) => {
+      let nTemplatesPerUser = new Map();
+      gestureClass.getSamples().forEach((sample) => {
+        if (nTemplatesPerUser.has(sample.user)) {
+          nTemplatesPerUser.set(sample.user, nTemplatesPerUser.get(sample.user) + 1);
+        } else {
+          nTemplatesPerUser.set(sample.user, 1);
+        }
+      });
+      nTemplatesPerUser.forEach((nTemplates) => {
+        maxTrainingSetSize = Math.min(maxTrainingSetSize, nTemplates - 1);
+      });
+    });
+    maxTrainingSetSize = Math.min(maxTrainingSetSize, this.maxT);
+    if (maxTrainingSetSize != this.maxT) {
+      LogHelper.log('warn', `The configured value for maximum number of training templates (T = ${this.maxT}) is too large! The maximum supported value for this gesture set (UD testing) is T = ${maxTrainingSetSize}.`)
+    }
+
+    // Compute training set sizes
+    let trainingSetSizes = [];
+    for (let trainingSetSize = Math.max(1, this.minT); trainingSetSize <= maxTrainingSetSize; trainingSetSize = computeNextT(trainingSetSize)) {
+      trainingSetSizes.push(trainingSetSize);
+    }
+
+    // Perform the test for each size of training set
+    for (let i = 0; i < trainingSetSizes.length; i++) {
+      let trainingSetSize = trainingSetSizes[i];
+      let res = {
+        n: trainingSetSize,
+        accuracy: 0.0,
+        time: 0.0,
+        confusionMatrix: []
+      };
+      res.confusionMatrix = new Array(dataset.G).fill(0).map(() => new Array(dataset.G).fill(0));
+
+      // Repeat the test this.r times
+      for (let r = 0; r < this.r; r++) {
+        // Initialize the recognizer and select the candidates
+        let recognizer = new recognizerModule.module(recognizerModule.moduleSettings);
+        let candidates = selectCandidates(dataset);
+        // For each gesture class, mark the templates that cannot be reused
+        let markedTemplates = [];
+        candidates.forEach(candidate => {
+          markedTemplates.push([candidate]);
+        });
+        
+        // Train the recognizer
+        for (let t = 0; t < trainingSetSize; t++) { // Add trainingSetSize strokeData per gestureClass
+          // Add one sample for each gesture class
+          let index = 0;
+          dataset.getGestureClasses().forEach((gestureClass) => {
+            // Select a valid training template (could be more efficient by randomizing only over the user's gestures)
+            let training = -1;
+            while (training == -1 || markedTemplates[index].includes(training) || gestureClass.getSamples()[training].user !== gestureClass.getSamples()[markedTemplates[index][0]].user) {
+              training = getRandomNumber(0, gestureClass.getSamples().length);
+            }
+            // Mark the training template
+            markedTemplates[index].push(training);
+            // Train the recognizer
+            recognizer.addGesture(gestureClass.name, gestureClass.getSamples()[training]);
+            index++;
+          });
+        }
+        // Test the recognizer
+        let index = 0;
+        dataset.getGestureClasses().forEach((gestureClass) => {
+          // Retrieve the testing sample
+          let toBeTested = gestureClass.getSamples()[candidates[index]];
+          // Attempt recognition
+          if (this.recognizerType === 'dynamic') {
+            var result = recognizer.recognize(toBeTested);
+          } else {
+            var result = recognizer.recognize(toBeTested.frame);
+          }
+          // Update the confusion matrix
+          if (dataset.getGestureClasses().has(result.name)) {
+            let resultIndex = dataset.getGestureClasses().get(result.name).index;
+            res.confusionMatrix[gestureClass.index][resultIndex] += 1;
+          }
+          // Update execution time and accuracy
+          res.accuracy += (result.name === gestureClass.name) ? 1 : 0;
+          res.time += result.time;
+          index++;
+        });
+        // Compute and print progress
+        let progress = i / trainingSetSizes.length + r / (this.r * trainingSetSizes.length);
+        printProgress(progress);
+      }
+      res.accuracy = res.accuracy / (this.r * dataset.G);
+      res.time = res.time / (this.r * dataset.G);
+      results.push(res);
+    }
+    return results;
   }
 }
 
 
 // HELPER FUNCTIONS
+
+function getTimeStr(msTime) {
+  // Convert to seconds:
+  let seconds = msTime / 1000;
+  // Extract days:
+  const days = parseInt(seconds / (3600 * 24));
+  seconds = seconds % (3600 * 24);
+  // Extract hours:
+  const hours = parseInt(seconds / 3600);
+  seconds = seconds % 3600;
+  // Extract minutes:
+  const minutes = parseInt(seconds / 60);
+  seconds = parseInt(seconds % 60);
+  
+  if (days != 0) {
+    timeStr = `${days} days, ${hours} hours`;
+  } else if (hours != 0) {
+    timeStr = `${hours} hours, ${minutes} minutes`;
+  } else if (minutes != 0) {
+    timeStr = `${minutes} minutes, ${seconds} seconds`;
+  } else {
+    timeStr = `${seconds} seconds`;
+  }
+  
+  return timeStr;
+}
 
 /**
  * Return a random list of candidate gestures, 1 candidate per gesture class.
@@ -178,10 +340,11 @@ function loadDataset(type, datasetsConfig) {
   // Load the dataset
   let datasetLoaderModule = datasetsConfig.modules[0];
   let datasetLoader = datasetLoaderModule.module;
-  let identifier = datasetLoaderModule.additionalSettings.id;
+  let sensorId = datasetLoaderModule.additionalSettings.sensorId;
+  let datasetId = datasetLoaderModule.additionalSettings.datasetId;
   let datasetName = datasetLoaderModule.additionalSettings.datasets[0];
   let datasetPath = path.resolve(__dirname, '../datasets', type, datasetName); // TODO improve
-  let dataset = datasetLoader.loadDataset(datasetName, datasetPath, identifier, [])
+  let dataset = datasetLoader.loadDataset(datasetName, datasetPath, sensorId, datasetId, [])
   // Select/aggregate/rename classes of the dataset if required
   if (datasetsConfig.aggregateClasses && datasetsConfig.aggregateClasses.length != 0) {
     let newDataset = new GestureSet(dataset.name);
@@ -201,10 +364,18 @@ function loadDataset(type, datasetsConfig) {
       // Add the aggregate class to the new dataset
       newDataset.addGestureClass(newClass);
     });
-    return newDataset
-  } else {
-    return dataset;
+    dataset = newDataset;
   }
+  // Get users
+  let users = datasetLoaderModule.additionalSettings.users;
+  users = users.split(',').filter(x => x.length > 0);
+  if (users.length > 0) {
+    for (let [key, gestureClass] of dataset.getGestureClasses()) {
+      gestureClass.samples = gestureClass.samples.filter(sample => users.includes(sample.user));
+      gestureClass.TperG = gestureClass.samples.length;
+    }
+  }
+  return dataset;
 }
 
 module.exports = {

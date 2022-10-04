@@ -39,7 +39,7 @@
             "required": true,
             "label": "Minimum number of templates",
             "name": "minT",
-            "description": "The minimum number of training templates used for the training of the recognizers.",
+            "description": "The minimum number of training templates (per gesture class) used for the training of the recognizers.",
             "minValue": 1,
             "maxValue": null,
             "default": 1
@@ -49,16 +49,23 @@
             "required": true,
             "label": "Maximum number of templates",
             "name": "maxT",
-            "description": "The maximum number of training templates used for the training of the recognizers.",
+            "description": "The maximum number of training templates (per gesture class) used for the training of the recognizers.",
             "minValue": 1,
             "maxValue": null,
             "default": 1
           },
           {
             "type": "BooleanInput",
-            "name": "forceDifferentUsers",
-            "label": "Force different users",
-            "description": "Force the selection of training templates produced by different users than the one that produced the testing testing.",
+            "name": "userDependent",
+            "label": "Run user-dependent scenario",
+            "description": "Test the recognizers in a user-dependent scenario, i.e., in which the templates used for training and testing the recognizers are produced by the same user.",
+            "default": true
+          },
+          {
+            "type": "BooleanInput",
+            "name": "userIndependent",
+            "label": "Run user-independent scenario",
+            "description": "Test the recognizers in a user-dependent scenario, i.e., in which the templates used for training are produced by a different set of users that the templates used for testing.",
             "default": true
           }
         ]
@@ -103,10 +110,28 @@
             },
             {
               "type": "TextInput",
-              "name": "id",
-              "label": "Identifier",
-              "description": "Unique identifier for the dataset (strongly recommended if multiple datasets are selected).",
-              "minLength": 1,
+              "name": "users",
+              "label": "User(s)",
+              "description": "The users that are used to train the recognizer(s), separated by a comma (\",\"). Leave empty to select all users.",
+              "minLength": 0,
+              "maxLength": null,
+              "default": ""
+            },
+            {
+              "type": "TextInput",
+              "name": "sensorId",
+              "label": "Sensor identifier",
+              "description": "Identifier of the sensor matching this dataset. The identifier is added at the beginning the name of each point, in the following format: SensorId_PointName. If no sensor identifier is provided, the original names of the points are kept.",
+              "minLength": 0,
+              "maxLength": null,
+              "default": "test"
+            },
+            {
+              "type": "TextInput",
+              "name": "datasetId",
+              "label": "Dataset identifier",
+              "description": "Unique identifier for the dataset (recommended if multiple datasets are selected). The identifier is added at the beginning the name of each gesture, in the following format: DatasetId_GestureName. If no dataset identifier is provided, the original names of the gestures are kept.",
+              "minLength": 0,
               "maxLength": null,
               "default": ""
             }

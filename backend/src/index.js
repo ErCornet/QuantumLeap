@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const QuantumLeap = require('./framework/quantumleap');
 const UserIndependentTesting = require('./framework/testing').UserIndependentTesting;
+const UserDependentTesting = require('./framework/testing').UserDependentTesting;
 const Configuration = require('./framework/config-helper');
+const LogHelper = require('./framework/log-helper');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -38,7 +40,7 @@ let quantumLeap = new QuantumLeap(server);
 try {
   quantumLeap.start(qlConfig);
 } catch (err) {
-  console.error(`Unable to start QuantumLeap. Details: ${err.stack}`);
+  LogHelper.log('error', `Unable to start QuantumLeap. Details: ${err.stack}`);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +104,7 @@ app.put('/quantumleap/values/:moduleType?/:gestureType?', (req, res) => {
   try {
     configuration.saveValues();
   } catch (err) {
-    console.error(`Unable to save the values. Details: ${err.stack}`);
+    LogHelper.log('error', `Unable to save the values. Details: ${err.stack}`);
   }
 });
 
@@ -116,7 +118,7 @@ app.post('/quantumleap/actions/start', (req, res) => {
     quantumLeap.start(qlConfig);
     return res.status(204).send();
   } catch (err) {
-    console.log(`Unable to restart QuantumLeap. Details: ${err.stack}`)
+    LogHelper.log('error', `Unable to restart QuantumLeap. Details: ${err.stack}`)
     res.status(500).send();
   } 
 });
@@ -126,7 +128,7 @@ app.post('/quantumleap/actions/stop', (req, res) => {
     quantumLeap.stop();
     return res.status(204).send();
   } catch (err) {
-    console.log(`Unable to stop QuantumLeap. Details: ${err.stack}`)
+    LogHelper.log('error', `Unable to stop QuantumLeap. Details: ${err.stack}`)
     res.status(500).send();
   } 
 });
@@ -149,18 +151,23 @@ app.put('/testing/dynamic/values', (req, res) => {
   try {
     testingConfigD.saveValues();
   } catch (err) {
-    console.error(`Unable to save the values. Details: ${err.stack}`);
+    LogHelper.log('error', `Unable to save the values. Details: ${err.stack}`);
   }
 });
 app.post('/testing/dynamic/actions/start', (req, res) => {
   try {
     let parsedTestingConfig = testingConfigD.toQLConfig();
-    // TODO
-    let userIndependentTesting = new UserIndependentTesting('dynamic', parsedTestingConfig.main.settings);
-    userIndependentTesting.run();
+    if (parsedTestingConfig.main.settings.general.testingParams.userDependent) {
+      let userDependentTesting = new UserDependentTesting('dynamic', parsedTestingConfig.main.settings);
+      userDependentTesting.run();
+    }
+    if (parsedTestingConfig.main.settings.general.testingParams.userIndependent) {
+      let userIndependentTesting = new UserIndependentTesting('dynamic', parsedTestingConfig.main.settings);
+      userIndependentTesting.run();
+    }
     return res.status(200).send();
   } catch (err) {
-    console.log(`Unable to start testing. Details: ${err.stack}`)
+    LogHelper.log('error', `Unable to start testing. Details: ${err.stack}`)
     res.status(500).send();
   } 
 });
@@ -183,18 +190,23 @@ app.put('/testing/static/values', (req, res) => {
   try {
     testingConfigS.saveValues();
   } catch (err) {
-    console.error(`Unable to save the values. Details: ${err.stack}`);
+    LogHelper.log('error', `Unable to save the values. Details: ${err.stack}`);
   }
 });
 app.post('/testing/static/actions/start', (req, res) => {
   try {
     let parsedTestingConfig = testingConfigS.toQLConfig();
-    // TODO
-    let userIndependentTesting = new UserIndependentTesting('static', parsedTestingConfig.main.settings);
-    userIndependentTesting.run();
+    if (parsedTestingConfig.main.settings.general.testingParams.userDependent) {
+      let userDependentTesting = new UserDependentTesting('static', parsedTestingConfig.main.settings);
+      userDependentTesting.run();
+    }
+    if (parsedTestingConfig.main.settings.general.testingParams.userIndependent) {
+      let userIndependentTesting = new UserIndependentTesting('static', parsedTestingConfig.main.settings);
+      userIndependentTesting.run();
+    }
     return res.status(200).send();
   } catch (err) {
-    console.log(`Unable to start testing. Details: ${err.stack}`)
+    LogHelper.log('error', `Unable to start testing. Details: ${err.stack}`)
     res.status(500).send();
   } 
 });
@@ -206,5 +218,5 @@ server.on('request', app);
 ////////////////////////////////////////////////////////////////////////////////
 // Start the server
 server.listen(SERVER_PORT, SERVER_IP, () => {
-  console.log(`QuantumLeap listening @ ${SERVER_IP}:${SERVER_PORT}.`);
+  LogHelper.log('info', `QuantumLeap listening @ ${SERVER_IP}:${SERVER_PORT}.`);
 });

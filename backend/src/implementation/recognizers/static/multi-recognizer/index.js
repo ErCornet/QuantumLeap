@@ -1,5 +1,4 @@
 const AbstractStaticRecognizer = require('../../../../framework/modules/recognizers/static/abstract-static-recognizer').AbstractStaticRecognizer;
-
 const { performance } = require('perf_hooks');
 
 class Recognizer extends AbstractStaticRecognizer {
@@ -7,9 +6,11 @@ class Recognizer extends AbstractStaticRecognizer {
 
   constructor(options, dataset) {
     super();
+		this.trainingGestures = [];
     this.recognizers = [];
 		this.weights = [];
 		options.recognizers.forEach(recognizer => {
+			this.trainingGestures.push(recognizer.additionalSettings.trainingGestures);
 			this.recognizers.push(new recognizer.module(recognizer.moduleSettings));
 			this.weights.push(recognizer.additionalSettings.weight);
 		});
@@ -24,14 +25,18 @@ class Recognizer extends AbstractStaticRecognizer {
 	}
 
 	addGesture(name, sample) {
-		this.recognizers.forEach(recognizer => {
-			recognizer.addGesture(name, sample);
+		this.recognizers.forEach((recognizer, index) => {
+			if (isInTrainingSet(name, this.trainingGestures[index])) {
+				recognizer.addGesture(name, sample);
+			}
 		});
 	}
 
 	removeGesture(name) {
-		this.recognizers.forEach(recognizer => {
-			recognizer.removeGesture(name);
+		this.recognizers.forEach((recognizer, index) => {
+			if (isInTrainingSet(name, this.trainingGestures[index])) {
+				recognizer.removeGesture(name);
+			}
 		});
 	}
 
@@ -63,6 +68,16 @@ class Recognizer extends AbstractStaticRecognizer {
 	toString() {
     return `${Recognizer.name}`;
   }
+}
+
+function isInTrainingSet(gesture, trainingSet) {
+	if (trainingSet === undefined || trainingSet === null || trainingSet.length === 0) {
+		// Keep all gestures
+		return true;
+	} else {
+		// Keep only gestures in the training set
+		return trainingSet.indexOf(gesture) !== -1;
+	}
 }
 
 module.exports = Recognizer;
