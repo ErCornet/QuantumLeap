@@ -3,7 +3,7 @@
     "settings": {
       "general": {
         "general": {
-          "debug": true,
+          "debug": false,
           "sendContinuousData": true
         },
         "server": {
@@ -12,17 +12,7 @@
         }
       },
       "sensors": {
-        "modules": [
-          {
-            "uuid": "7b385e70-074e-402e-b158-3195b793d1ad",
-            "moduleName": "myo-sensor",
-            "moduleType": "sensors",
-            "moduleSettings": {},
-            "additionalSettings": {
-              "id": "myo-sensor"
-            }
-          }
-        ],
+        "modules": [],
         "framerate": 60
       },
       "filters": {
@@ -31,12 +21,12 @@
       "datasets": {
         "static": {
           "modules": [],
-          "templatesPerClass": 400,
+          "templatesPerClass": 0,
           "aggregateClasses": []
         },
         "dynamic": {
           "modules": [],
-          "templatesPerClass": 8,
+          "templatesPerClass": 0,
           "aggregateClasses": []
         }
       },
@@ -44,45 +34,12 @@
         "modules": []
       },
       "segmenters": {
-        "modules": [
-          {
-            "uuid": "b2f03033-5b23-4cdd-8f94-09b64c6c5ba8",
-            "moduleName": "window",
-            "moduleType": "segmenters",
-            "moduleSettings": {
-              "windows": [
-                {
-                  "width": 20,
-                  "uuid": "4e9b510e-73e9-4b5f-bf60-5b6428f23ed0"
-                }
-              ],
-              "intervalLength": 3,
-              "pauseLength": 60
-            },
-            "additionalSettings": {
-              "motionThreshold": 70,
-              "motionArticulations": {
-                "myo-sensor": [
-                  "Acceleration",
-                  "Rotation",
-                  "EMG0",
-                  "EMG1",
-                  "EMG2",
-                  "EMG3",
-                  "EMG4",
-                  "EMG5",
-                  "EMG6",
-                  "EMG7"
-                ]
-              }
-            }
-          }
-        ]
+        "modules": []
       },
       "recognizers": {
         "static": {
           "modules": [],
-          "scoreThreshold": 0.3,
+          "scoreThreshold": 0.25,
           "bufferLength": 15,
           "poseRatioThreshold": 0.8,
           "sendIfRequested": true,
@@ -90,7 +47,7 @@
         },
         "dynamic": {
           "modules": [],
-          "scoreThreshold": 0.035,
+          "scoreThreshold": 0.25,
           "sendIfRequested": true,
           "loadOnRequest": false
         }

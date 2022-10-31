@@ -56,7 +56,7 @@ class Testing {
           data: res
         });
       }
-      // console.log('\n', datasetResults);
+      console.log(datasetResults.data);
       results.push(datasetResults);
     }
     LogHelper.log('info', `Ending Testing (${this.testingType})`);

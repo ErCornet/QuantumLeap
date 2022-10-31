@@ -2,7 +2,7 @@
   "label": "Myo Armband Dataset Loader",
   "name": "myo-loader",
   "type": "dataset/dynamic",
-  "description": "A loader for static Myo Armband datasets.",
+  "description": "A loader for dynamic Myo Armband datasets.",
   "properties": {},
   "settings": []
 }

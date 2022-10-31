@@ -24,16 +24,6 @@ class Sensor extends AbstractSensor
 
 /*    let points = []
 
-    points.push({
-      name: "Origin",
-      point: new Point3D(0, 0, -1, undefined)
-    });
-
-    points.push({
-      name: "Origin2",
-      point: new Point3D(0, 0, 1, undefined)
-    });
-
     // TODO
     points.push({
       name: "Acceleration",
@@ -68,8 +58,11 @@ class Sensor extends AbstractSensor
     // Create WebSocket connection.
     this.socket = new WebSocket("ws://localhost:6450");
 
+    console.log("Hello");
+
     // Open Connection
     this.socket.addEventListener('open', function (event) {
+      console.log("Open");
         //this.socket.send(JSON.stringify({background: true}))
     });
 

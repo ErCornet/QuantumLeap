@@ -9,23 +9,61 @@
           "r": 100,
           "minT": 1,
           "maxT": 8,
-          "userDependent": true,
+          "userDependent": false,
           "userIndependent": true
         },
         "globalParams": {
-          "samplingPoints": 16,
-          "points": []
+          "samplingPoints": 50,
+          "points": {
+            "": [
+              "Acceleration"
+            ]
+          }
         }
       },
       "datasets": {
         "dynamic": {
-          "modules": [],
+          "modules": [
+            {
+              "uuid": "dab0767a-f4b0-44b9-9f7d-3868fff4c2d0",
+              "moduleName": "myo-loader",
+              "moduleType": "datasets/dynamic",
+              "moduleSettings": {},
+              "additionalSettings": {
+                "datasets": [
+                  "myo-dataset"
+                ],
+                "users": "",
+                "sensorId": "myo",
+                "datasetId": ""
+              }
+            }
+          ],
           "aggregateClasses": []
         }
       },
       "recognizers": {
         "dynamic": {
-          "modules": []
+          "modules": [
+            {
+              "uuid": "6a5c954a-f3a2-43ca-be01-caa4121e3e01",
+              "moduleName": "jackknife",
+              "moduleType": "recognizers/dynamic",
+              "moduleSettings": {
+                "samplingPoints": 50,
+                "points": {
+                  "myo": [
+                    "ModOrientation",
+                    "ModAcceleration",
+                    "ModRotation"
+                  ]
+                }
+              },
+              "additionalSettings": {
+                "useCustomParams": true
+              }
+            }
+          ]
         }
       }
     }
