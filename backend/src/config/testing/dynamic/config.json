@@ -14,11 +14,7 @@
         },
         "globalParams": {
           "samplingPoints": 50,
-          "points": {
-            "": [
-              "Acceleration"
-            ]
-          }
+          "points": {}
         }
       },
       "datasets": {
@@ -53,9 +49,10 @@
                 "samplingPoints": 50,
                 "points": {
                   "myo": [
-                    "ModOrientation",
-                    "ModAcceleration",
-                    "ModRotation"
+                    "BoundedOrientation",
+                    "BoundedAcceleration",
+                    "BoundedRotation",
+                    "BoundedEMG"
                   ]
                 }
               },
