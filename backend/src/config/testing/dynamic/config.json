@@ -9,7 +9,7 @@
           "r": 100,
           "minT": 1,
           "maxT": 8,
-          "userDependent": false,
+          "userDependent": true,
           "userIndependent": true
         },
         "globalParams": {
@@ -27,7 +27,7 @@
               "moduleSettings": {},
               "additionalSettings": {
                 "datasets": [
-                  "myo-dataset"
+                  "myo-dataset-bounded"
                 ],
                 "users": "",
                 "sensorId": "myo",
@@ -49,10 +49,10 @@
                 "samplingPoints": 50,
                 "points": {
                   "myo": [
-                    "BoundedOrientation",
-                    "BoundedAcceleration",
-                    "BoundedRotation",
-                    "BoundedEMG"
+                    "orientation",
+                    "acceleration",
+                    "rotation",
+                    "emg"
                   ]
                 }
               },

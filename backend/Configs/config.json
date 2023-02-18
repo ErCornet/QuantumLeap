@@ -1,0 +1,251 @@
+{
+  "main": {
+    "settings": {
+      "general": {
+        "general": {
+          "debug": true
+        },
+        "testingParams": {
+          "r": 100,
+          "minT": 1,
+          "maxT": 8,
+          "userDependent": false,
+          "userIndependent": true
+        },
+        "globalParams": {
+          "samplingPoints": 50,
+          "points": {}
+        }
+      },
+      "datasets": {
+        "dynamic": {
+          "modules": [
+            {
+              "uuid": "dab0767a-f4b0-44b9-9f7d-3868fff4c2d0",
+              "moduleName": "myo-loader",
+              "moduleType": "datasets/dynamic",
+              "moduleSettings": {},
+              "additionalSettings": {
+                "datasets": [
+                  "myo-dataset"
+                ],
+                "users": "",
+                "sensorId": "myo",
+                "datasetId": ""
+              }
+            }
+          ],
+          "aggregateClasses": [
+            {
+              "uuid": "43328a2f-c930-4476-bfdf-3316f941da88",
+              "name": "calibration",
+              "gestureClasses": [
+                "calibration"
+              ]
+            },
+            {
+              "uuid": "05c12ef0-f51c-489d-9d42-85849738620c",
+              "name": "FistDownOnce",
+              "gestureClasses": [
+                "FistDownOnce"
+              ]
+            },
+            {
+              "uuid": "bb74e91b-00a2-4061-b54f-213d322ded28",
+              "name": "FlatHandAndRotateBackward",
+              "gestureClasses": [
+                "FlatHandAndRotateBackward"
+              ]
+            },
+            {
+              "uuid": "a1f62f7f-6988-42b6-bdcf-1d91e1a89217",
+              "name": "FlatHandAndRotateForward",
+              "gestureClasses": [
+                "FlatHandAndRotateForward"
+              ]
+            },
+            {
+              "uuid": "12fe9a10-e3cc-4e3a-981d-9b3bbc9a4f9a",
+              "name": "FlatHandAndRotateLeft",
+              "gestureClasses": [
+                "FlatHandAndRotateLeft"
+              ]
+            },
+            {
+              "uuid": "2da00ad8-854e-445c-98c2-5efb8e96d327",
+              "name": "FlatHandAndRotateRight",
+              "gestureClasses": [
+                "FlatHandAndRotateRight"
+              ]
+            },
+            {
+              "uuid": "3d744188-0255-4362-a65a-ce73ebc5c3fc",
+              "name": "FlickHandLeft",
+              "gestureClasses": [
+                "FlickHandLeft"
+              ]
+            },
+            {
+              "uuid": "5eca5165-7cdc-4e92-96c8-894d4be6e373",
+              "name": "FlickHandRight",
+              "gestureClasses": [
+                "FlickHandRight"
+              ]
+            },
+            {
+              "uuid": "77cfba8f-1b28-444d-bdc7-498cca6816c4",
+              "name": "HandGunAndBendThumb",
+              "gestureClasses": [
+                "HandGunAndBendThumb"
+              ]
+            },
+            {
+              "uuid": "52c20669-0e15-4c7c-8945-8771c9bc0820",
+              "name": "HangupPhone",
+              "gestureClasses": [
+                "HangupPhone"
+              ]
+            },
+            {
+              "uuid": "ed4eff7f-0539-434f-b268-17635d3e74eb",
+              "name": "PickupPhone",
+              "gestureClasses": [
+                "PickupPhone"
+              ]
+            },
+            {
+              "uuid": "8ea9d3d5-9ae3-43ac-8822-9ad1bfca3cdb",
+              "name": "PressButton",
+              "gestureClasses": [
+                "PressButton"
+              ]
+            },
+            {
+              "uuid": "5faf1bf5-8231-450b-a964-5429d86ff230",
+              "name": "Pull",
+              "gestureClasses": [
+                "Pull"
+              ]
+            },
+            {
+              "uuid": "fae9dc19-4970-40c2-9168-d60eef4faa57",
+              "name": "Shake",
+              "gestureClasses": [
+                "Shake"
+              ]
+            },
+            {
+              "uuid": "d43fb704-8d11-4dc6-a1a8-6c33539f822e",
+              "name": "SlideLeft",
+              "gestureClasses": [
+                "SlideLeft"
+              ]
+            },
+            {
+              "uuid": "bf2c6ad1-ad4a-4cde-9826-e4942f529200",
+              "name": "SlideRight",
+              "gestureClasses": [
+                "SlideRight"
+              ]
+            },
+            {
+              "uuid": "f1cbc815-740a-4f80-a424-92532389187d",
+              "name": "SnapFingers",
+              "gestureClasses": [
+                "SnapFingers"
+              ]
+            },
+            {
+              "uuid": "cc33975a-ad7d-4246-acb3-629aee075aac",
+              "name": "TapOnce",
+              "gestureClasses": [
+                "TapOnce"
+              ]
+            },
+            {
+              "uuid": "4904e95e-9ace-47bf-be95-5a3dfbad11ba",
+              "name": "TapThrice",
+              "gestureClasses": [
+                "TapThrice"
+              ]
+            },
+            {
+              "uuid": "fed8fdc5-9c1e-4b66-a241-9460ad133b79",
+              "name": "ThumbUpAndRotateBackward",
+              "gestureClasses": [
+                "ThumbUpAndRotateBackward"
+              ]
+            },
+            {
+              "uuid": "08a0f2d8-e682-49fb-9c55-ba4100e20ac2",
+              "name": "ThumbUpAndRotateForward",
+              "gestureClasses": [
+                "ThumbUpAndRotateForward"
+              ]
+            },
+            {
+              "uuid": "aa136092-8737-4da5-8be2-37ddb3f60b17",
+              "name": "ThumbUpAndRotateLeft",
+              "gestureClasses": [
+                "ThumbUpAndRotateLeft"
+              ]
+            },
+            {
+              "uuid": "d3180de6-b07e-4387-b3dc-ed7358604d4d",
+              "name": "ThumbUpAndRotateRight",
+              "gestureClasses": [
+                "ThumbUpAndRotateRight"
+              ]
+            },
+            {
+              "uuid": "aac3b373-5f63-4251-ac85-8119dc8445f6",
+              "name": "TurnButtonnLeft",
+              "gestureClasses": [
+                "TurnButtonnLeft"
+              ]
+            },
+            {
+              "uuid": "f18029ef-9fc3-4442-b76b-0386c10312e3",
+              "name": "TurnButtonnRight",
+              "gestureClasses": [
+                "TurnButtonnRight"
+              ]
+            },
+            {
+              "uuid": "391a4497-8681-4786-9d9c-d6660da831bd",
+              "name": "Push",
+              "gestureClasses": [
+                "Push"
+              ]
+            }
+          ]
+        }
+      },
+      "recognizers": {
+        "dynamic": {
+          "modules": [
+            {
+              "uuid": "6a5c954a-f3a2-43ca-be01-caa4121e3e01",
+              "moduleName": "jackknife",
+              "moduleType": "recognizers/dynamic",
+              "moduleSettings": {
+                "samplingPoints": 50,
+                "points": {
+                  "myo": [
+                    "BoundedOrientation",
+                    "BoundedAcceleration",
+                    "BoundedRotation",
+                    "BoundedEMG"
+                  ]
+                }
+              },
+              "additionalSettings": {
+                "useCustomParams": true
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
