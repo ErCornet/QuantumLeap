@@ -38,7 +38,11 @@
       "TurnButtonnRight"
     ],
     "data": [
-      {"name": "JackknifeRecognizer", "options": {"samplingPoints": 50, "points": {"myo": ["orientation", "acceleration", "rotation"]}}, "data": []}
+      {
+        "name": "JackknifeRecognizer",
+        "options": {"samplingPoints": 50, "points": {"myo": ["orientation", "acceleration", "rotation", "emg"]}},
+        "data": []
+      }
     ]
   }
 ]

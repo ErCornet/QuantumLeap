@@ -31,7 +31,7 @@ function loadDataset(name, datasetPath, sensorId, datasetId, sensorsPointsNames)
     for(var gestureName in data) {
         let newGestureClass = new GestureClass(gestureName, gestureIndex++);
 
-        // For each User-Sample
+        // For each Sample
         for(var idUserSample in data[gestureName]) {
             userID = parseInt(idUserSample.split("_")[0]);
             sampleID = parseInt(idUserSample.split("_")[1]);

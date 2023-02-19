@@ -4,6 +4,9 @@ const fs = require('fs');
 const fontWhite =  "\x1b[37m";
 const fontYellow = "\x1b[33m"
 
+console.clear();
+console.log(fontYellow, "Importing Data...", fontWhite);
+
 const currentDirectory = process.cwd();
 const prepInfoFile = currentDirectory + "\\process-info.txt";
 const currentDirectoryParts = currentDirectory.split('backend');
@@ -12,18 +15,17 @@ const datasetInputDirectory = backendDirectory + "\\src\\datasets\\dynamic\\myo-
 
 const prepInfo = JSON.parse(fs.readFileSync(prepInfoFile, 'utf-8'));
 const discard = prepInfo['discard'];
-const righthandedParticipants = prepInfo['righthandedParticipants'];
-const lefthandedParticipants = prepInfo['lefthandedParticipants'];
+const righthandedUsers = prepInfo['righthandedUsers'];
+const lefthandedUsers = prepInfo['lefthandedUsers'];
 const usbFacingWrist = prepInfo['usbFacingWrist'];
 const usbFacingElbow = prepInfo['usbFacingElbow'];
+
+let users = [];
 
 let numberOfGestureClasses = 0;
 let gestureClassesIndex = [];
 
 let dataRaw = new Object();
-
-console.clear();
-console.log(fontYellow, "Importing Data...", fontWhite);
 
 // For each user
 fs.readdirSync(datasetInputDirectory, { withFileTypes: true }).filter(dirent => !dirent.isFile()).map(dirent => dirent.name).forEach((dir) => {
@@ -31,15 +33,17 @@ fs.readdirSync(datasetInputDirectory, { withFileTypes: true }).filter(dirent => 
     const stat = fs.lstatSync(userDirPath);
     if (!stat.isDirectory()) return;
 
-    const idUser = parseInt(dir.split("_")[0]);
+    const idUser = parseInt(dir.split("_")[0]);    	
 	const idSample = parseInt(dir.split("_")[1]);
 	const idUserSample = idUser + "_" + idSample;
 
+    if(!(users.includes(idUser))) users.push(idUser);
+
 	// Only keep data from participants with known infos
-	if(!(righthandedParticipants.includes(idUser) || lefthandedParticipants.includes(idUser))) return;
+	if(!(righthandedUsers.includes(idUser) || lefthandedUsers.includes(idUser))) return;
 
     // Don't include left handed participants for now
-    if (lefthandedParticipants.includes(idUser)) return;
+    if (lefthandedUsers.includes(idUser)) return;
 
     // Malformed otherwise
     if(dataRaw[idUserSample] != undefined) return;
@@ -79,7 +83,33 @@ fs.readdirSync(datasetInputDirectory, { withFileTypes: true }).filter(dirent => 
 });
 
 console.log();
-console.log(fontYellow, "id".padEnd(8), fontWhite, "Name".padEnd(24), "\t", "#user-samples".padEnd(16));
+console.log(fontYellow, "User".padEnd(8), fontWhite, "Handedness".padEnd(16));
+
+for(var i in users) {
+	const u = users[i];
+	if(righthandedUsers.includes(u)) console.log(fontYellow, u.toString().padEnd(8), fontWhite, "Right".padEnd(16), "".padEnd(16));
+	if(lefthandedUsers.includes(u)) console.log(fontYellow, u.toString().padEnd(8), fontWhite, "".padEnd(16), "Left".padEnd(16));
+}
+
+console.log();
+console.log(fontYellow, "Sample".padEnd(8), fontWhite, "Configuration".padEnd(16));
+
+for(var i in users) {
+	const u = users[i];
+
+	for(var j in usbFacingWrist) {
+			if(JSON.stringify(usbFacingWrist[j]) === JSON.stringify([u, 1])) console.log(fontYellow, (u + "_" + 1).padEnd(8), fontWhite, "Wrist".padEnd(16), "".padEnd(16));
+			if(JSON.stringify(usbFacingWrist[j]) === JSON.stringify([u, 2])) console.log(fontYellow, (u + "_" + 2).padEnd(8), fontWhite, "Wrist".padEnd(16), "".padEnd(16));
+	}
+
+	for(var j in usbFacingElbow) {
+		if(JSON.stringify(usbFacingElbow[j]) === JSON.stringify([u, 1])) console.log(fontYellow, (u + "_" + 1).padEnd(8), fontWhite, "".padEnd(16), "Elbow".padEnd(16));
+		if(JSON.stringify(usbFacingElbow[j]) === JSON.stringify([u, 2])) console.log(fontYellow, (u + "_" + 2).padEnd(8), fontWhite, "".padEnd(16), "Elbow".padEnd(16));
+	}
+}
+
+console.log();
+console.log(fontYellow, "id".padEnd(8), fontWhite, "Name".padEnd(24), "\t", "Samples".padEnd(16));
 
 for(var gestureName in dataRaw) {
 	console.log(fontYellow, gestureClassesIndex[gestureName].toString().padEnd(8), fontWhite, gestureName.padEnd(24), "\t", Object.keys(dataRaw[gestureName]).length.toString().padEnd(16));
@@ -173,6 +203,7 @@ function dist(p1, p2) {
     return Math.sqrt(n);
 }
 
+// High-pass Filter
 for(var gestureName in dataRaw) {
 	dataFiltered[gestureName] = new Object();
 
@@ -195,6 +226,24 @@ for(var gestureName in dataRaw) {
 		}
 	}
 }
+
+// Low-pass Filter
+for(var gestureName in dataFiltered)
+	for(var idUserSample in dataFiltered[gestureName])
+		for(let i = 1; i < dataFiltered[gestureName][idUserSample].length; i++)
+		{
+			for(let j = 0; j < dataFiltered[gestureName][idUserSample][i].orientation.length; j++)
+				dataFiltered[gestureName][idUserSample][i].orientation[j] = (dataFiltered[gestureName][idUserSample][i - 1].orientation[j] + dataFiltered[gestureName][idUserSample][i].orientation[j]) / 2;
+
+			for(let j = 0; j < dataFiltered[gestureName][idUserSample][i].acceleration.length; j++)
+				dataFiltered[gestureName][idUserSample][i].acceleration[j] = (dataFiltered[gestureName][idUserSample][i - 1].acceleration[j] + dataFiltered[gestureName][idUserSample][i].acceleration[j]) / 2;
+
+			for(let j = 0; j < dataFiltered[gestureName][idUserSample][i].rotation.length; j++)
+				dataFiltered[gestureName][idUserSample][i].rotation[j] = (dataFiltered[gestureName][idUserSample][i - 1].rotation[j] + dataFiltered[gestureName][idUserSample][i].rotation[j]) / 2;
+
+			for(let j = 0; j < dataFiltered[gestureName][idUserSample][i].emg.length; j++)
+				dataFiltered[gestureName][idUserSample][i].emg[j] = (dataFiltered[gestureName][idUserSample][i - 1].emg[j] + dataFiltered[gestureName][idUserSample][i].emg[j]) / 2;
+		}
 
 // Bounded
 console.log();
@@ -322,20 +371,29 @@ function rotate(q, v) {
 
 let dataNormalized = new Object();
 
-for(var gestureName in dataFiltered) {
+const zRotation = [ 0, 0, 1, 0 ];
+
+for(var gestureName in dataBounded) {
 	dataNormalized[gestureName] = new Object();
 
-	for(var idUserSample in dataFiltered[gestureName]) {
+	for(var idUserSample in dataBounded[gestureName]) {
 		dataNormalized[gestureName][idUserSample] = [];		
 
-		const referenceOrientationInverse = conjugate(normalizeQuaternion(dataBounded["calibration"][idUserSample][0].orientation));
-		const gesture = dataBounded[gestureName][idUserSample];
+		let referenceOrientationInverse = undefined;
 
-		const timestampReference = gesture[0].timestamp;
+		for(var j in usbFacingWrist)
+			if((usbFacingWrist[j][0] + "_" + usbFacingWrist[j][1]) === idUserSample) 
+				referenceOrientationInverse = conjugate(normalizeQuaternion(dataBounded["calibration"][idUserSample][0].orientation));
+
+		for(var j in usbFacingElbow)
+			if((usbFacingElbow[j][0] + "_" + usbFacingElbow[j][1]) === idUserSample) 
+				referenceOrientationInverse = conjugate(normalizeQuaternion(product(dataBounded["calibration"][idUserSample][0].orientation, zRotation)));
+
+		const gesture = dataBounded[gestureName][idUserSample];
 
 		for(let i = 0; i < gesture.length; i++) {
 			const point_i = gesture[i];
-
+			
 			const newPoint_i = {
 	        	timestamp : point_i.timestamp,
 	        	orientation : product(normalizeQuaternion(point_i.orientation), referenceOrientationInverse),
@@ -343,7 +401,7 @@ for(var gestureName in dataFiltered) {
 	        	rotation : rotate(referenceOrientationInverse, point_i.rotation),
 	        	emg : point_i.emg,
 	        	direction : rotate(normalizeQuaternion(point_i.orientation), [ 1, 0, 0 ])
-	        }
+	        };
 
 			dataNormalized[gestureName][idUserSample].push(newPoint_i);
 		}
