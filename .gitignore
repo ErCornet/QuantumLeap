@@ -4,16 +4,8 @@ node_modules
 backend/node_modules
 frontend/node_modules
 
-backend/results
-backend/logs.txt
-backend/results-dynamic.json
-backend/results-static.json
-backend/src/datasets
-!backend/src/datasets/dynamic/guinevere
-!backend/src/datasets/dynamic/guinevere_switched_handedness
-!backend/src/datasets/dynamic/guinevere_unified
-!backend/src/datasets/static/guinevere-static
-!backend/src/datasets/static/guinevere-static2
-!backend/src/datasets/dynamic/guinevere-static2_switched_handedness
-
-backend/results-dynamic-UD.json
+backend/src/datasets/dynamic/myo-dataset-analyse
+backend/src/datasets/dynamic/myo-dataset-raw
+backend/src/datasets/dynamic/myo-dataset-filtered
+backend/src/datasets/dynamic/myo-dataset-bounded
+backend/src/datasets/dynamic/myo-dataset-normalized

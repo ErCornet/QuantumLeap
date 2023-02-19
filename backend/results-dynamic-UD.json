@@ -1,0 +1,44 @@
+[
+  {
+    "r": 100,
+    "dataset": "myo-dataset-normalized",
+    "gestures": [
+      "calibration",
+      "FistDownOnce",
+      "FistDownTwice",
+      "FlatHandAndRotateBackward",
+      "FlatHandAndRotateForward",
+      "FlatHandAndRotateLeft",
+      "FlatHandAndRotateRight",
+      "FlickFingerLeft",
+      "FlickFingerRight",
+      "FlickHandLeft",
+      "FlickHandRight",
+      "GrabAndRotateLeft",
+      "GrabAndRotateRight",
+      "HandGun",
+      "HandGunAndBendThumb",
+      "HangupPhone",
+      "PickupPhone",
+      "PressButton",
+      "Pull",
+      "Push",
+      "Shake",
+      "SlideLeft",
+      "SlideRight",
+      "SnapFingers",
+      "TapOnce",
+      "TapThrice",
+      "TapTwice",
+      "ThumbUpAndRotateBackward",
+      "ThumbUpAndRotateForward",
+      "ThumbUpAndRotateLeft",
+      "ThumbUpAndRotateRight",
+      "TurnButtonnLeft",
+      "TurnButtonnRight"
+    ],
+    "data": [
+      {"name": "JackknifeRecognizer", "options": {"samplingPoints": 50, "points": {"myo": ["orientation", "acceleration", "rotation"]}}, "data": []}
+    ]
+  }
+]
