@@ -8,4 +8,3 @@ backend/src/datasets/dynamic/myo-dataset-analyse
 backend/src/datasets/dynamic/myo-dataset-raw
 backend/src/datasets/dynamic/myo-dataset-filtered
 backend/src/datasets/dynamic/myo-dataset-bounded
-backend/src/datasets/dynamic/myo-dataset-normalized
