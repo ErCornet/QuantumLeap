@@ -5,12 +5,13 @@ const fontWhite =  "\x1b[37m";
 const fontYellow = "\x1b[33m"
 
 const currentDirectory = process.cwd();
-const prepInfoFile = currentDirectory + "\\prep-info.txt";
+const prepInfoFile = currentDirectory + "\\process-info.txt";
 const currentDirectoryParts = currentDirectory.split('backend');
 const backendDirectory = currentDirectoryParts[currentDirectoryParts.length - 2] + "backend";
 const datasetInputDirectory = backendDirectory + "\\src\\datasets\\dynamic\\myo-dataset";
 
 const prepInfo = JSON.parse(fs.readFileSync(prepInfoFile, 'utf-8'));
+const discard = prepInfo['discard'];
 const righthandedParticipants = prepInfo['righthandedParticipants'];
 const lefthandedParticipants = prepInfo['lefthandedParticipants'];
 const usbFacingWrist = prepInfo['usbFacingWrist'];
@@ -20,9 +21,6 @@ let numberOfGestureClasses = 0;
 let gestureClassesIndex = [];
 
 let dataRaw = new Object();
-let dataFiltered = new Object();
-let dataBounded = new Object();
-let dataNormalized = new Object();
 
 console.clear();
 console.log(fontYellow, "Importing Data...", fontWhite);
@@ -107,43 +105,67 @@ function exportData(datatype, dataObject) {
 		{
 			const analyseOutputFileUserSample = analyseOutputDirectory + "\\" + datatype + "_" + gestureName + "_" + idUserSample + ".csv";
 
-			let csvContentUserSample = "Timestamp, Orientation x, Orientation y, Orientation z, Orientation w, Acceleration x, Acceleration y, Acceleration z, Rotation x, Rotation y, Rotation z, EMG 0, EMG 1, EMG 2, EMG 3, EMG 4, EMG 5, EMG 6, EMG 7\n";
-
+			//let csvContentUserSample = "Timestamp,Orientation x, Orientation y, Orientation z, Orientation w, Acceleration x, Acceleration y, Acceleration z, Rotation x, Rotation y, Rotation z, EMG 0, EMG 1;EMG 2, EMG 3, EMG 4, EMG 5, EMG 6, EMG 7\n";
+			let csvContentUserSample = "Timestamp;Orientation x;Orientation y;Orientation z;Orientation w;Acceleration x;Acceleration y;Acceleration z;Rotation x;Rotation y;Rotation z;EMG 0;EMG 1;EMG 2;EMG 3;EMG 4;EMG 5;EMG 6;EMG 7\n";
+			
 			const gesture = dataObject[gestureName][idUserSample]
 
 		    for(let i = 0; i < gesture.length; i++) {
-		        csvContentUserSample +=   gesture[i].timestamp
-					                + "," + gesture[i].orientation[0] + "," + gesture[i].orientation[1] + "," + gesture[i].orientation[2] + "," + gesture[i].orientation[3]
-					                + "," + gesture[i].acceleration[0] + "," + gesture[i].acceleration[1] + "," + gesture[i].acceleration[2] 
-					                + "," + gesture[i].rotation[0] + "," + gesture[i].rotation[1] + "," + gesture[i].rotation[2] 
-					                + "," + gesture[i].emg[0] + "," + gesture[i].emg[1] + "," + gesture[i].emg[2] + "," + gesture[i].emg[3] 
-					                + "," + gesture[i].emg[4] + "," + gesture[i].emg[5] + "," + gesture[i].emg[6] + "," + gesture[i].emg[7] 
-					                + "\n";
+		    	if(gesture[i].direction != undefined)
+		    	{
+		    		csvContentUserSample += gesture[i].timestamp
+						                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
+						                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
+						                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
+						                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
+						                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
+						                + ";" + gesture[i].direction[0] + ";" + gesture[i].direction[1] + ";" + gesture[i].direction[2] 
+						                + "\n";
 
-				csvContent +=   gesture[i].timestamp
-					                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
-					                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
-					                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
-					                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
-					                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
-					                + "\n";
+		    		csvContent += gesture[i].timestamp
+						                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
+						                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
+						                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
+						                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
+						                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
+						                + ";" + gesture[i].direction[0] + ";" + gesture[i].direction[1] + ";" + gesture[i].direction[2] 
+						                + "\n";
+		    	}
+				else
+				{
+			    	csvContentUserSample += gesture[i].timestamp
+						                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
+						                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
+						                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
+						                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
+						                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
+						                + "\n";
+
+					csvContent += gesture[i].timestamp
+						                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
+						                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
+						                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
+						                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
+						                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
+						                + "\n";
+				}
 		    }
 
-		    fs.writeFileSync(analyseOutputFileUserSample, csvContentUserSample, (err) => { if (err) console.error(err); });
+		    fs.writeFileSync(analyseOutputFileUserSample, csvContentUserSample.replace(/["."]/g, ","), (err) => { if (err) console.error(err); });
 
 		    csvContent += "\n";
 		}
 
-		fs.writeFileSync(analyseOutputFile, csvContent, (err) => { if (err) console.error(err); });
+		fs.writeFileSync(analyseOutputFile, csvContent.replace(/["."]/g, ","), (err) => { if (err) console.error(err); });
 	}
 }
-
-exportData("raw", dataRaw);
 
 // Filtered
 
 console.log();
 console.log(fontYellow, "Filtering...", fontWhite);
+
+let dataFiltered = new Object();
 
 function dist(p1, p2) {
     let n = 0;
@@ -174,11 +196,11 @@ for(var gestureName in dataRaw) {
 	}
 }
 
-exportData("filtered", dataFiltered);
-
 // Bounded
 console.log();
 console.log(fontYellow, "Bounding...", fontWhite);
+
+let dataBounded = new Object();
 
 // O* -> [-1, +1]
 // A* -> [-1, +1]
@@ -255,61 +277,80 @@ for(var gestureName in dataFiltered) {
 	        			(point_i.emg[4] - minE) / diffE, (point_i.emg[5] - minE) / diffE, (point_i.emg[6] - minE) / diffE, (point_i.emg[7] - minE) / diffE]
 	        }
 
-	        for(dimension in newPoint_i)
-	        	for(var j = 0; j < newPoint_i[dimension].length; j++)
-	        		newPoint_i[dimension][j] = (2 * newPoint_i[dimension][j]) - 1;
+	        for(var j = 0; j < newPoint_i.orientation.length; j++)
+	        	newPoint_i.orientation[j] = (2 * newPoint_i.orientation[j]) - 1;
+
+	       	for(var j = 0; j < newPoint_i.acceleration.length; j++)
+	        	newPoint_i.acceleration[j] = (2 * newPoint_i.acceleration[j]) - 1;
+
+	        for(var j = 0; j < newPoint_i.rotation.length; j++)
+	        	newPoint_i.rotation[j] = (2 * newPoint_i.rotation[j]) - 1;
 
 			dataBounded[gestureName][idUserSample].push(newPoint_i);
 		}
 	}
 }
 
-exportData("bounded", dataBounded);
-
 // Normalized
 console.log();
 console.log(fontYellow, "Normalizing...", fontWhite);
 
-// function normalizeQuaternion(q) {
-//     let n = Math.sqrt((q[0] * q[0]) + (q[1] * q[1]) + (q[2] * q[2]) + (q[3] * q[3]));
+function normalizeQuaternion(q) {
+    let n = Math.sqrt((q[0] * q[0]) + (q[1] * q[1]) + (q[2] * q[2]) + (q[3] * q[3]));
 
-//     return [ q[0] / n, q[1] / n, q[2] / n, q[3] / n ];
-// }
+    return [ q[0] / n, q[1] / n, q[2] / n, q[3] / n ];
+}
 
-// function conjugate(q) {
-//     return [ -q[0], -q[1], -q[2], q[3] ];
-// }
+function conjugate(q) {
+    return [ -q[0], -q[1], -q[2], q[3] ];
+}
 
-// function product(a, b) {
-//     return  [    
-//                 (a[3] * b[3]) - (a[0] * b[0]) - (a[1] * b[1]) - (a[2] * b[2]),
-//                 (a[3] * b[0]) + (a[0] * b[3]) + (a[1] * b[2]) - (a[2] * b[1]),
-//                 (a[3] * b[1]) - (a[0] * b[2]) + (a[1] * b[3]) + (a[2] * b[0]),
-//                 (a[3] * b[2]) + (a[0] * b[1]) - (a[1] * b[0]) + (a[2] * b[3]) 
-//             ]
-// }
+function product(a, b) {
+    return  [    
+                (a[3] * b[3]) - (a[0] * b[0]) - (a[1] * b[1]) - (a[2] * b[2]),
+                (a[3] * b[0]) + (a[0] * b[3]) + (a[1] * b[2]) - (a[2] * b[1]),
+                (a[3] * b[1]) - (a[0] * b[2]) + (a[1] * b[3]) + (a[2] * b[0]),
+                (a[3] * b[2]) + (a[0] * b[1]) - (a[1] * b[0]) + (a[2] * b[3]) 
+            ]
+}
 
-// function rotate(q, v) {
-//     let quat_vec = [ v[0], v[1], v[2], 0 ];
-//     let quat_res = product(q, product(quat_vec, conjugate(q)));
-//     return [ quat_res[0], quat_res[1], quat_res[2]];
-// }
+function rotate(q, v) {
+    let quat_vec = [ v[0], v[1], v[2], 0 ];
+    let quat_res = product(q, product(quat_vec, conjugate(q)));
+    return [ quat_res[0], quat_res[1], quat_res[2]];
+}
 
-// // Normalized
-// let normalizedOrientation = [];
-// let normalizedAcceleration = [];
-// let normalizedRotation = [];
-// let normalizedEmg = boundedEmg;
+let dataNormalized = new Object();
 
-// for(let i = 0; i < filteredTimestamp.length; i++)
-// {
-//     if(referenceOrientationInverse == undefined)
-//         referenceOrientationInverse = conjugate(boundedOrientation[i]);
+for(var gestureName in dataFiltered) {
+	dataNormalized[gestureName] = new Object();
 
-//     normalizedOrientation.push(product(boundedOrientation[i], referenceOrientationInverse));
-//     normalizedAcceleration.push(rotate(referenceOrientationInverse, boundedAcceleration[i]));
-//     //normalizedAcceleration.push(rotate(normalizedOrientation[i], [1, 0, 0]));
-//     normalizedRotation.push(rotate(referenceOrientationInverse, boundedRotation[i]));
-// }
+	for(var idUserSample in dataFiltered[gestureName]) {
+		dataNormalized[gestureName][idUserSample] = [];		
 
+		const referenceOrientationInverse = conjugate(normalizeQuaternion(dataBounded["calibration"][idUserSample][0].orientation));
+		const gesture = dataBounded[gestureName][idUserSample];
+
+		const timestampReference = gesture[0].timestamp;
+
+		for(let i = 0; i < gesture.length; i++) {
+			const point_i = gesture[i];
+
+			const newPoint_i = {
+	        	timestamp : point_i.timestamp,
+	        	orientation : product(normalizeQuaternion(point_i.orientation), referenceOrientationInverse),
+	        	acceleration : rotate(referenceOrientationInverse, point_i.acceleration),
+	        	rotation : rotate(referenceOrientationInverse, point_i.rotation),
+	        	emg : point_i.emg,
+	        	direction : rotate(normalizeQuaternion(point_i.orientation), [ 1, 0, 0 ])
+	        }
+
+			dataNormalized[gestureName][idUserSample].push(newPoint_i);
+		}
+	}
+}
+
+exportData("raw", dataRaw);
+exportData("filtered", dataFiltered);
+exportData("bounded", dataBounded);
 exportData("normalized", dataNormalized);

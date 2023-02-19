@@ -27,7 +27,7 @@
               "moduleSettings": {},
               "additionalSettings": {
                 "datasets": [
-                  "myo-dataset-bounded"
+                  "myo-dataset-normalized"
                 ],
                 "users": "",
                 "sensorId": "myo",
