@@ -46,9 +46,8 @@ const colorBlue = "#000069";
 const height = 500;
 const width = 500;
 
-function plotLines(name, x, y, c)
+function plotLines(image, name, x, y, c)
 {
-	const image = PImage.make(width, height);
 	const context = image.getContext('2d');
 
 	const fileName = name + ".png";
@@ -83,19 +82,23 @@ function plotLines(name, x, y, c)
 		context.stroke();
 	}
 
+	return image;
+}
 
-	PImage.encodePNGToStream(image, fs.createWriteStream(fileName)).then(() => { console.log(fontYellow, "Exported ", fontWhite, fileName); }).catch((e)=>{ console.log(fontRed, "Error while exporting", fontWhite, fileName); });
+function log(base, x)
+{
+	return Math.log(x) / Math.log(base);
 }
 
 let frequencyAccelerationX = [];
 let frequencyAccelerationY = [];
 let frequencyAccelerationC = [];
 
-for(var i = 0; i < 20; i++) 
+for(var i = 0; i < 100; i++) 
 {
 	frequencyAccelerationX.push(i);
-	frequencyAccelerationX.push(0);
-	frequencyAccelerationX.push(colorBlack);
+	frequencyAccelerationY.push(0);
+	frequencyAccelerationC.push(colorBlack);
 }
 
 for(var gestureName in dataRaw) {
@@ -107,16 +110,22 @@ for(var gestureName in dataRaw) {
 			for(var j = 0; j < gesture[i].acceleration.length; j++)
 				diffY = Math.max(diffY, Math.abs(gesture[i].acceleration[j] - gesture[i - 1].acceleration[j]));
 
-			//console.log(diffX, diffY);
-			const frequencyLog = parseInt(Math.log(1 + (diffY / diffX)));
-			// console.log(gesture[i].acceleration);
-			// console.log(diffX, diffY);
-			// console.log(frequencyLog);
-			frequencyAccelerationY[frequencyLog]++;
+			const frequencyLog = parseInt(log(1.5, 1 + (diffY / diffX)));
+			frequencyAccelerationY[25 + frequencyLog]++;
 		}
 	}
 }
 
+for(var i = 0; i < 100; i++) 
+{
+	frequencyAccelerationY[i] = log(1.5, 1 + frequencyAccelerationY[i]);
+}
+
+console.log(frequencyAccelerationX);
 console.log(frequencyAccelerationY);
 
-plotLines("FrequencyAcceleration", frequencyAccelerationX, frequencyAccelerationY, frequencyAccelerationC);
+const frequencyAccelerationImage = PImage.make(width, height);
+
+plotLines(frequencyAccelerationImage, "FrequencyAcceleration", frequencyAccelerationX, frequencyAccelerationY, frequencyAccelerationC);
+
+PImage.encodePNGToStream(frequencyAccelerationImage, fs.createWriteStream(fileName)).then(() => { console.log(fontYellow, "Exported ", fontWhite, fileName); }).catch((e)=>{ console.log(fontRed, "Error while exporting", fontWhite, fileName); });
