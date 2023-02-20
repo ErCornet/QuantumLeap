@@ -9,7 +9,7 @@
           "r": 100,
           "minT": 1,
           "maxT": 8,
-          "userDependent": true,
+          "userDependent": false,
           "userIndependent": true
         },
         "globalParams": {

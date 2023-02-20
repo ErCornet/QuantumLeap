@@ -5,22 +5,13 @@
   "gestures": [
     "calibration",
     "FistDownOnce",
-    "FistDownTwice",
     "FlatHandAndRotateBackward",
     "FlatHandAndRotateForward",
-    "FlatHandAndRotateLeft",
-    "FlatHandAndRotateRight",
-    "FlickFingerLeft",
-    "FlickFingerRight",
     "FlickHandLeft",
     "FlickHandRight",
     "GrabAndRotateLeft",
     "GrabAndRotateRight",
-    "HandGun",
-    "HandGunAndBendThumb",
-    "HangupPhone",
     "PickupPhone",
-    "PressButton",
     "Pull",
     "Push",
     "Shake",
@@ -28,13 +19,8 @@
     "SlideRight",
     "SnapFingers",
     "TapOnce",
-    "TapTwice",
     "TapThrice",
-    "ThumbUpAndRotateBackward",
-    "ThumbUpAndRotateForward",
     "ThumbUpAndRotateLeft",
-    "ThumbUpAndRotateRight",
-    "TurnButtonnLeft",
-    "TurnButtonnRight"
+    "ThumbUpAndRotateRight"
   ]
 }
