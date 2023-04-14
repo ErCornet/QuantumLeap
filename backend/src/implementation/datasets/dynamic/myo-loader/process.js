@@ -14,9 +14,10 @@ const backendDirectory = currentDirectoryParts[currentDirectoryParts.length - 2]
 const datasetInputDirectory = backendDirectory + "\\src\\datasets\\dynamic\\myo-dataset";
 
 const prepInfo = JSON.parse(fs.readFileSync(prepInfoFile, 'utf-8'));
-const discard = prepInfo['discard'];
-const righthandedUsers = prepInfo['righthandedUsers'];
-const lefthandedUsers = prepInfo['lefthandedUsers'];
+const discardParticipants = prepInfo['discardParticipants'];
+const discardSamples = prepInfo['discardSamples'];
+const righthandedUsers = prepInfo['righthandedParticipants'];
+const lefthandedUsers = prepInfo['lefthandedParticipants'];
 const usbFacingWrist = prepInfo['usbFacingWrist'];
 const usbFacingElbow = prepInfo['usbFacingElbow'];
 
@@ -38,12 +39,13 @@ fs.readdirSync(datasetInputDirectory, { withFileTypes: true }).filter(dirent => 
 	const idUserSample = idUser + "_" + idSample;
 
     // Don't include left handed participants for now
-    if (lefthandedUsers.includes(idUser)) return;
+    // if (lefthandedUsers.includes(idUser)) return;
 
     // Don't include participants with usb facing elbow for now
-    for(var i in usbFacingElbow) if(JSON.stringify(usbFacingElbow[i]) === JSON.stringify([idUser, idSample])) return;
+    // for(var i in usbFacingElbow) if(JSON.stringify(usbFacingElbow[i]) === JSON.stringify([idUser, idSample])) return;
 
-    if(discard.includes(idUserSample)) return;
+    if(discardParticipants.includes(idUser)) return;
+    if(discardSamples.includes(idUserSample)) return;
 
     if(!(users.includes(idUser))) users.push(idUser);
 
@@ -366,9 +368,12 @@ for(var gestureName in dataBounded) {
 	for(var idUserSample in dataBounded[gestureName]) {
 		dataNormalized[gestureName][idUserSample] = [];
 
-		const referenceOrientationInverse = conjugate(dataBounded["calibration"][idUserSample][0].orientation);
+		// const referenceOrientationInverse = conjugate(dataBounded["calibration"][idUserSample][0].orientation);
+		// const referenceOrientationInverse = conjugate(dataBounded["calibration"]["1_1"][0].orientation);
+		const referenceOrientationInverse = conjugate(dataBounded[gestureName][idUserSample][0].orientation);
 
-		const referenceAcceleration = dataBounded["calibration"][idUserSample][0].acceleration;
+		// const referenceAcceleration = dataBounded["calibration"][idUserSample][0].acceleration;
+		const referenceAcceleration = dataBounded[gestureName][idUserSample][0].acceleration;
 
 		for(var i = 0; i < dataBounded[gestureName][idUserSample].length; i++) {
 			const point_i = dataBounded[gestureName][idUserSample][i];
@@ -392,8 +397,8 @@ for(var gestureName in dataBounded) {
 	}
 }
 
-// exportData("raw", dataRaw);
-// exportData("filtered", dataFiltered);
+exportData("raw", dataRaw);
+exportData("filtered", dataFiltered);
 exportData("bounded", dataBounded);
 exportData("normalized", dataNormalized);
 

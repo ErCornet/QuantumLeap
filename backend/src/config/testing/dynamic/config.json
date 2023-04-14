@@ -9,8 +9,8 @@
           "r": 100,
           "minT": 1,
           "maxT": 8,
-          "userDependent": false,
-          "userIndependent": true
+          "userDependent": true,
+          "userIndependent": false
         },
         "globalParams": {
           "samplingPoints": 50,

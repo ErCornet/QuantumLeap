@@ -36,6 +36,10 @@ function loadDataset(name, datasetPath, sensorId, datasetId, sensorsPointsNames)
             userID = parseInt(idUserSample.split("_")[0]);
             sampleID = parseInt(idUserSample.split("_")[1]);
 
+            if(! (Object.keys(data[gestureName]).includes(userID + "_" + 1) && Object.keys(data[gestureName]).includes(userID + "_" + 2))) continue;
+
+            console.log(gestureName + " " + idUserSample);
+
             let strokeData = new StrokeData(userID, sampleID);
 
             let orientationStroke = new Stroke(0);
