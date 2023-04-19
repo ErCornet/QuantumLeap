@@ -10,7 +10,7 @@
           "minT": 1,
           "maxT": 8,
           "userDependent": true,
-          "userIndependent": false
+          "userIndependent": true
         },
         "globalParams": {
           "samplingPoints": 50,
