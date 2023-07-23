@@ -13,24 +13,22 @@ const fontYellow = "\x1b[33m"
 console.clear();
 console.log(fontYellow, "Importing Data...", fontWhite);
 let dataRaw = importData(true);
+exportData("raw", dataRaw);
 
-// Filtered
+// Filter
 console.log();
 console.log(fontYellow, "Filtering...", fontWhite);
-
 let dataFiltered = filter(dataRaw);
+exportData("filtered", dataFiltered);
 
-// Bounded
+// Bound
 console.log();
 console.log(fontYellow, "Bounding...", fontWhite);
 let dataBounded = bound(dataFiltered)
+exportData("bounded", dataBounded);
 
-// Normalized
+// Normalize
 console.log();
 console.log(fontYellow, "Normalizing...", fontWhite);
 let dataNormalized = normalize(dataBounded);
-
-// exportData("raw", dataRaw);
-// exportData("filtered", dataFiltered);
-exportData("bounded", dataBounded);
 exportData("normalized", dataNormalized);

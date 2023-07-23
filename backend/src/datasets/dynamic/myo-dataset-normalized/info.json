@@ -19,6 +19,7 @@
     "HandGun",
     "HandGunAndBendThumb",
     "PickupPhone",
+    "HangupPhone",
     "PressButton",
     "Pull",
     "Push",
@@ -29,32 +30,11 @@
     "TapOnce",
     "TapTwice",
     "TapThrice",
-    "ThumbUpAndRotateBacward",
+    "ThumbUpAndRotateBackward",
     "ThumbUpAndRotateForward",
     "ThumbUpAndRotateLeft",
     "ThumbUpAndRotateRight",
     "TurnButtonLeft",
     "TurnButtonRight"
-  ],
-  "__gestures": [
-  "calibration",
-  "FistDownOnce",
-  "FlatHandAndRotateBackward",
-  "FlatHandAndRotateForward",
-  "FlickHandLeft",
-  "FlickHandRight",
-  "GrabAndRotateLeft",
-  "GrabAndRotateRight",
-  "PickupPhone",
-  "Pull",
-  "Push",
-  "Shake",
-  "SlideLeft",
-  "SlideRight",
-  "SnapFingers",
-  "TapOnce",
-  "TapThrice",
-  "ThumbUpAndRotateLeft",
-  "ThumbUpAndRotateRight"
-]
+  ]
 }

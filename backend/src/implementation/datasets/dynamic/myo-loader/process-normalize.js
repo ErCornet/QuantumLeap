@@ -83,7 +83,8 @@ function normalize(dataBounded)
 		        	orientation : relativeOrientation,
 		        	acceleration : relativeAcceleration,
 		        	rotation : relativeRotation,
-		        	emg : point_i.emg
+		        	emg : point_i.emg,
+		        	direction : rotate(relativeOrientation, [1, 0, 0])
 		        };
 
 				dataNormalized[gestureName][idUserSample].push(newPoint_i);

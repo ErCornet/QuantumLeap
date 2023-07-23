@@ -1,6 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 
+// Disclaimer : This code only works on datasets with number of samples per user = 0, 1 or 2
+
 function importData(verbose)
 {
 	const fontWhite =  "\x1b[37m";
@@ -20,45 +22,70 @@ function importData(verbose)
 	const usbFacingWrist = prepInfo['usbFacingWrist'];
 	const usbFacingElbow = prepInfo['usbFacingElbow'];
 
+	const discardRight = prepInfo['discardRight'];
+	const discardLeft = prepInfo['discardLeft'];
+	const discardWrist = prepInfo['discardWrist'];
+	const discardElbow = prepInfo['discardElbow'];
+	const discardDifferentConfiguration = prepInfo['discardDifferentConfiguration'];
+	const discardSingleSample = prepInfo['discardSingleSample'];
+
 	let users = [];
+	let samples = [];
 
 	let numberOfGestureClasses = 0;
 	let gestureClassesIndex = [];
 
 	let dataRaw = new Object();
 
-	// For each user
+	// For each participant + shot
 	fs.readdirSync(datasetInputDirectory, { withFileTypes: true }).filter(dirent => !dirent.isFile()).map(dirent => dirent.name).forEach((dir) => {
 	    const userDirPath = path.join(datasetInputDirectory, dir);
 	    const stat = fs.lstatSync(userDirPath);
 	    if (!stat.isDirectory()) return;
 
 	    const idUser = parseInt(dir.split("_")[0]);    	
-		const idSample = parseInt(dir.split("_")[1]);
-		const idUserSample = idUser + "_" + idSample;
-
-	    // Don't include left handed participants for now
-	    // if (lefthandedUsers.includes(idUser)) return;
-
-	    // Don't include participants with usb facing elbow for now
-	    // if(usbFacingElbow.includes(idUserSample)) return;
-
-		// Don't include samples with different usb configuration
-		let sample1FacingWrist = usbFacingWrist.includes(idUser + "_" + 1);
-		let sample2FacingWrist = usbFacingWrist.includes(idUser + "_" + 2);
-		let sample1FacingElbow = usbFacingElbow.includes(idUser + "_" + 1);
-		let sample2FacingElbow = usbFacingElbow.includes(idUser + "_" + 2);
-
-	    // if(sample1FacingWrist != sample2FacingWrist) return;
-	    // if(sample1FacingElbow != sample2FacingElbow) return;
+		const idBurst = parseInt(dir.split("_")[1]);
+		const idSample = idUser + "_" + idBurst;
 
 	    // Don't include participants in the blacklist
 	    if(discardParticipants.includes(idUser)) return;
 
 	    // Don't include samples in the blacklist
-	    if(discardSamples.includes(idUserSample)) return;
+	    if(discardSamples.includes(idSample)) return;
 
-	    if(!(users.includes(idUser))) users.push(idUser);
+	    // Don't include samples based on handedness
+		if (discardRight && righthandedUsers.includes(idUser)) return;
+	    if (discardLeft && lefthandedUsers.includes(idUser)) return;
+
+	    // Don't include samples based on facing
+	   	if (discardWrist && usbFacingWrist.includes(idSample)) return;
+	    if (discardElbow && usbFacingElbow.includes(idSample)) return;
+
+		// Don't include samples with different usb configuration
+		if(discardDifferentConfiguration)
+		{
+			let sample1FacingWrist = usbFacingWrist.includes(idUser + "_" + 1);
+			let sample2FacingWrist = usbFacingWrist.includes(idUser + "_" + 2);
+			let sample1FacingElbow = usbFacingElbow.includes(idUser + "_" + 1);
+			let sample2FacingElbow = usbFacingElbow.includes(idUser + "_" + 2);
+
+		    if(sample1FacingWrist != sample2FacingWrist) return;
+		    if(sample1FacingElbow != sample2FacingElbow) return;
+		}
+		
+		// Don't include participants with single sample
+		if(discardSingleSample)
+		{
+			let sample1FacingWrist = usbFacingWrist.includes(idUser + "_" + 1);
+			let sample2FacingWrist = usbFacingWrist.includes(idUser + "_" + 2);
+			let sample1FacingElbow = usbFacingElbow.includes(idUser + "_" + 1);
+			let sample2FacingElbow = usbFacingElbow.includes(idUser + "_" + 2);
+
+		    if(! ((sample1FacingWrist || sample1FacingElbow) && (sample2FacingWrist || sample2FacingElbow))) return;
+		}
+
+		if(!(users.includes(idUser))) users.push(idUser);
+		samples.push(idSample);
 
 	    // For each gesture class
 	    fs.readdirSync(userDirPath).forEach((gestureFile) => {
@@ -68,7 +95,7 @@ function importData(verbose)
 	        if(dataRaw[gestureName] == undefined) dataRaw[gestureName] = new Object();
 	        if(gestureClassesIndex[gestureName] == undefined) gestureClassesIndex[gestureName] = numberOfGestureClasses++;
 
-	        if(dataRaw[gestureName][idUserSample] == undefined) dataRaw[gestureName][idUserSample] = [];
+	        if(dataRaw[gestureName][idSample] == undefined) dataRaw[gestureName][idSample] = [];
 
 	        let lines = fs.readFileSync(gestureClassPath, 'utf-8').split(/\r?\n/);
 	        lines = lines.slice(1, lines.length - 1); //remove header and last line
@@ -77,13 +104,12 @@ function importData(verbose)
 		        values = line.split(',');
 
 		        const timestamp = parseInt(values[0]);
-		        // const orientation = [ parseInt(values[1]), parseInt(values[2]), parseInt(values[3]), parseInt(values[4]) ];	// (x, y, z, w)
 		        const orientation = [ parseInt(values[4]), parseInt(values[1]), parseInt(values[2]), parseInt(values[3]) ];		// (w, x, y, z)
 		        const acceleration = [ parseInt(values[5]), parseInt(values[6]), parseInt(values[7])];
 		        const rotation = [ parseInt(values[8]), parseInt(values[9]), parseInt(values[10]) ];
 		        const emg = [ parseInt(values[11]), parseInt(values[12]), parseInt(values[13]), parseInt(values[14]), parseInt(values[15]), parseInt(values[16]), parseInt(values[17]), parseInt(values[18]) ];
 	        
-		        dataRaw[gestureName][idUserSample].push(
+		        dataRaw[gestureName][idSample].push(
 		        {
 		        	timestamp : timestamp,
 		        	orientation : orientation,
@@ -94,21 +120,6 @@ function importData(verbose)
 	        });
 	    });
 	});
-
-	// Only keep samples for a gesture if the user performed the same gesture more than once
-	// for(var gestureName in dataRaw) {
-	// 	let newGestureData = []
-
-	// 	for(var idUserSample in dataRaw[gestureName]) {
-	// 	    const idUser = parseInt(idUserSample.split("_")[0]);
-	// 	    if((dataRaw[gestureName][idUser + "_" + 1] != undefined) && (dataRaw[gestureName][idUser + "_" + 2] != undefined))
-	// 	    {
-	// 	    	newGestureData[idUser + "_" + 1] = dataRaw[gestureName][idUser + "_" + 1];
-	// 	    	newGestureData[idUser + "_" + 2] = dataRaw[gestureName][idUser + "_" + 2];
-	// 	    }
-	// 	}
-	// 	dataRaw[gestureName] = newGestureData;
-	// }
 
 	if(verbose)
 	{
@@ -124,13 +135,11 @@ function importData(verbose)
 		console.log();
 		console.log(fontYellow, "Sample".padEnd(8), fontWhite, "Configuration".padEnd(16));
 
-		for(var i in users) {
-			const u = users[i];
+		for(var i in samples) {
+			const s = samples[i];
 
-			if(usbFacingWrist.includes(u + "_" + 1)) console.log(fontYellow, (u + "_" + 1).padEnd(8), fontWhite, "Wrist".padEnd(16), "".padEnd(16));
-			if(usbFacingWrist.includes(u + "_" + 2)) console.log(fontYellow, (u + "_" + 2).padEnd(8), fontWhite, "Wrist".padEnd(16), "".padEnd(16));
-			if(usbFacingElbow.includes(u + "_" + 1)) console.log(fontYellow, (u + "_" + 1).padEnd(8), fontWhite, "".padEnd(16), "Elbow".padEnd(16));
-			if(usbFacingElbow.includes(u + "_" + 2)) console.log(fontYellow, (u + "_" + 2).padEnd(8), fontWhite, "".padEnd(16), "Elbow".padEnd(16));
+			if(usbFacingWrist.includes(s)) console.log(fontYellow, s.padEnd(8), fontWhite, "Wrist".padEnd(16), "".padEnd(16));
+			if(usbFacingElbow.includes(s)) console.log(fontYellow, s.padEnd(8), fontWhite, "".padEnd(16), "Elbow".padEnd(16));
 		}
 
 		console.log();
@@ -138,6 +147,16 @@ function importData(verbose)
 
 		for(var gestureName in dataRaw) {
 			console.log(fontYellow, gestureClassesIndex[gestureName].toString().padEnd(8), fontWhite, gestureName.padEnd(24), "\t", Object.keys(dataRaw[gestureName]).length.toString().padEnd(16));
+		}
+
+		console.log();
+		console.log(fontYellow, "Missing Samples:");
+
+		for(var gestureName in dataRaw) {
+			for(var i in samples) {
+				const s = samples[i];
+				if(dataRaw[gestureName][s] == undefined) console.log(fontWhite, gestureName + " - " + s);
+			}
 		}
 	}
 

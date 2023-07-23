@@ -49,7 +49,7 @@
                 "samplingPoints": 50,
                 "points": {
                   "myo": [
-                    "orientation",
+                    "direction",
                     "acceleration",
                     "rotation",
                     "emg"

@@ -38,5 +38,11 @@
 		"31_1", "31_2",
 		"34_1",
 		"60_1", "60_2"
-	]
+	],
+	"discardRight" : false,
+	"discardLeft" : false,
+	"discardWrist" : false,
+	"discardElbow" : false,
+	"discardDifferentConfiguration" : false,
+	"discardSingleSample" : false
 }
