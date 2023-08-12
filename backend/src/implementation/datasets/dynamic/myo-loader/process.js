@@ -15,19 +15,19 @@ const fontYellow = "\x1b[33m"
 console.clear();
 console.log(fontYellow, "Importing Data...", fontWhite);
 let dataRaw = importData(true);
-exportData("raw", dataRaw);
+// exportData("raw", dataRaw);
 
 // Filter
 console.log();
 console.log(fontYellow, "Filtering...", fontWhite);
 let dataFiltered = filter(dataRaw);
-exportData("filtered", dataFiltered);
+// exportData("filtered", dataFiltered);
 
 // Bound
 console.log();
 console.log(fontYellow, "Bounding...", fontWhite);
 let dataBounded = bound(dataFiltered)
-exportData("bounded", dataBounded);
+// exportData("bounded", dataBounded);
 
 // Normalize
 console.log();

@@ -29,15 +29,22 @@ function compute(type, content)
 
         let csvContent = ",";
 
-        for(let i = 0; i < gestures.length; i++) csvContent += gestures[i] + ",";
+        for(let i = 0; i < gestures.length; i++) csvContent += gestures[i].substring(0,8) + ",";
         csvContent += "\n";
 
         for(let i = 0; i < matrix.length; i++) {
-            csvContent += gestures[i];
+            csvContent += gestures[i].substring(0,8);
             for(let j = 0; j < matrix[i].length; j++) {
                 csvContent +=  "," + matrix[i][j];
             }
             csvContent += "\n";
+        }
+        for(let i = 0; i < matrix.length; i++)
+        {
+            let sum = 0;
+            for(let j = 0; j < matrix.length; j++) sum += matrix[i][j];
+
+            csvContent +=  "," + matrix[i][i] / sum;
         }
 
         fs.writeFileSync("./matrix_" + dataset + "_" + n + ".csv", csvContent, (err) => { if (err) console.error(err); });

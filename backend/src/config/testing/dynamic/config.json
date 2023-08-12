@@ -8,7 +8,7 @@
         "testingParams": {
           "r": 100,
           "minT": 1,
-          "maxT": 50,
+          "maxT": 16,
           "userDependent": true,
           "userIndependent": true
         },
