@@ -1,7 +1,7 @@
 {
   "label": "Myo dataset Normalized",
   "name": "myo_dataset_normalized",
-  "description": "Normalized dataset",
+  "description": "Normalized Dataset",
   "gestures": [
     "calibration",
     "FistDownOnce",

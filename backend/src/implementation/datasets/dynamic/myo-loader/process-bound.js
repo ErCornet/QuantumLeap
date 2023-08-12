@@ -10,6 +10,14 @@ function bound(dataFiltered)
 {
 	let dataBounded = new Object();
 
+	// Offset Acceleration.x, Acceleration.y, Acceleration.z Separately
+	let minAx = Number.MAX_VALUE;
+	let maxAx = Number.MIN_VALUE;
+	let minAy = Number.MAX_VALUE;
+	let maxAy = Number.MIN_VALUE;
+	let minAz = Number.MAX_VALUE;
+	let maxAz = Number.MIN_VALUE;
+
 	let minO = Number.MAX_VALUE;
 	let maxO = Number.MIN_VALUE;
 
@@ -29,8 +37,6 @@ function bound(dataFiltered)
 			for(let i = 0; i < gesture.length; i++) {
 				const point_i = gesture[i];
 
-				dataFiltered[gestureName][idUserSample][i].acceleration = [ point_i.acceleration[0] - 2000, point_i.acceleration[1] - 400, point_i.acceleration[2] + 2000 ];
-
 				const minO_ = Math.min(...(point_i.orientation));
 				const maxO_ = Math.max(...(point_i.orientation));
 				const minA_ = Math.min(...(point_i.acceleration));
@@ -49,9 +55,38 @@ function bound(dataFiltered)
 				maxA = Math.max(maxA, maxA_);
 				maxR = Math.max(maxR, maxR_);
 				maxE = Math.max(maxE, maxE_);
+
+				minAx = Math.min(minAx, point_i.acceleration[0]);
+				maxAx = Math.max(maxAx, point_i.acceleration[0]);
+
+				minAy = Math.min(minAy, point_i.acceleration[1]);
+				maxAy = Math.max(maxAy, point_i.acceleration[1]);
+
+				minAz = Math.min(minAz, point_i.acceleration[2]);
+				maxAz = Math.max(maxAz, point_i.acceleration[2]);
 			}
 		}
 	}
+
+	console.log("Min O : ", minO);
+	console.log("Max O : ", maxO);
+	console.log("Min A : ", minA);
+	console.log("Max A : ", maxA);
+	console.log("Min R : ", minR);
+	console.log("Max R : ", maxR);
+	console.log("Min E : ", minE);
+	console.log("Max E : ", maxE);
+
+	console.log("Min Ax : ", minAx);
+	console.log("Max Ax : ", maxAx);
+	console.log("Min Ay : ", minAy);
+	console.log("Max Ay : ", maxAy);
+	console.log("Min Az : ", minAz);
+	console.log("Max Az : ", maxAz);
+
+	const diffAx = maxAx - minAx;
+	const diffAy = maxAy - minAy;
+	const diffAz = maxAz - minAz;
 
 	const diffO = maxO - minO;
 	const diffA = maxA - minA;
@@ -73,11 +108,24 @@ function bound(dataFiltered)
 
 				const newPoint_i = {
 		        	timestamp : point_i.timestamp - timestampReference,
-		        	orientation : [ (point_i.orientation[0] - minO) / diffO, (point_i.orientation[1] - minO) / diffO, (point_i.orientation[2] - minO) / diffO, (point_i.orientation[3] - minO) / diffO ],
-		        	acceleration : [ (point_i.acceleration[0] - minA) / diffA, (point_i.acceleration[1] - minA) / diffA, (point_i.acceleration[2] - minA) / diffA ],
-		        	rotation : [ (point_i.rotation[0] - minR) / diffR, (point_i.rotation[1] - minR) / diffR, (point_i.rotation[2] - minR) / diffR ],
-		        	emg : [ (point_i.emg[0] - minE) / diffE, (point_i.emg[1] - minE) / diffE, (point_i.emg[2] - minE) / diffE, (point_i.emg[3] - minE) / diffE,
-		        			(point_i.emg[4] - minE) / diffE, (point_i.emg[5] - minE) / diffE, (point_i.emg[6] - minE) / diffE, (point_i.emg[7] - minE) / diffE]
+		        	orientation : [ (point_i.orientation[0] - minO) / diffO, 
+		        					(point_i.orientation[1] - minO) / diffO, 
+		        					(point_i.orientation[2] - minO) / diffO, 
+		        					(point_i.orientation[3] - minO) / diffO ],
+		        	acceleration : [((point_i.acceleration[0] - minAx) - (diffAx / 2) - minA) / diffA, 
+		        					((point_i.acceleration[1] - minAy) - (diffAy / 2) - minA) / diffA, 
+		        					((point_i.acceleration[2] - minAz) - (diffAz / 2) - minA) / diffA ],
+		        	rotation : [ 	(point_i.rotation[0] - minR) / diffR, 
+		        					(point_i.rotation[1] - minR) / diffR, 
+		        					(point_i.rotation[2] - minR) / diffR ],
+		        	emg : [ (point_i.emg[0] - minE) / diffE, 
+		        			(point_i.emg[1] - minE) / diffE, 
+		        			(point_i.emg[2] - minE) / diffE, 
+		        			(point_i.emg[3] - minE) / diffE,
+		        			(point_i.emg[4] - minE) / diffE, 
+		        			(point_i.emg[5] - minE) / diffE, 
+		        			(point_i.emg[6] - minE) / diffE, 
+		        			(point_i.emg[7] - minE) / diffE]
 		        }
 
 		       	for(var j = 0; j < newPoint_i.orientation.length; j++)

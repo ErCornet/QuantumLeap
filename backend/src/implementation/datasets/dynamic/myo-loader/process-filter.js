@@ -45,11 +45,12 @@ function filter(dataRaw)
 					for(var k = 0; k < dataFiltered_[gestureName][idUserSample][i][Object.keys(dataFiltered_[gestureName][idUserSample][i])[j]].length; k++)
 					{
 						let average = 0;
+						const nAverage = Math.min(i + 1, 3);
 
-						for(var l = 0; (0 <= (i - l)) && (l < 4); l++)
-							average += dataFiltered_[gestureName][idUserSample][i][Object.keys(dataFiltered_[gestureName][idUserSample][i])[j]][k];
+						for(var l = 0; l < nAverage; l++)
+							average += dataFiltered_[gestureName][idUserSample][i - l][Object.keys(dataFiltered_[gestureName][idUserSample][i - l])[j]][k];
 
-						dataFiltered[gestureName][idUserSample][i][Object.keys(dataFiltered[gestureName][idUserSample][i])[j]][k] = average / 10;
+						dataFiltered[gestureName][idUserSample][i][Object.keys(dataFiltered[gestureName][idUserSample][i])[j]][k] = average / nAverage;
 					}
 				}
 			}

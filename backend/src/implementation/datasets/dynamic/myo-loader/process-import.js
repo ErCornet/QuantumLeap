@@ -108,6 +108,13 @@ function importData(verbose)
 		        const acceleration = [ parseInt(values[5]), parseInt(values[6]), parseInt(values[7])];
 		        const rotation = [ parseInt(values[8]), parseInt(values[9]), parseInt(values[10]) ];
 		        const emg = [ parseInt(values[11]), parseInt(values[12]), parseInt(values[13]), parseInt(values[14]), parseInt(values[15]), parseInt(values[16]), parseInt(values[17]), parseInt(values[18]) ];
+	
+		        // All values except timestamp are completely random
+		        // const timestamp = parseInt(values[0]);
+		        // const orientation = [ Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100 ];		// (w, x, y, z)
+		        // const acceleration = [ Math.random() * 100, Math.random() * 100, Math.random() * 100];
+		        // const rotation = [ Math.random() * 100, Math.random() * 100, Math.random() * 100 ];
+		        // const emg = [ Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100 ];
 	        
 		        dataRaw[gestureName][idSample].push(
 		        {
@@ -123,6 +130,9 @@ function importData(verbose)
 
 	if(verbose)
 	{
+		var nUsers = users.length;
+		var nSamples = 0;
+
 		console.log();
 		console.log(fontYellow, "User".padEnd(8), fontWhite, "Handedness".padEnd(16));
 
@@ -146,6 +156,7 @@ function importData(verbose)
 		console.log(fontYellow, "id".padEnd(8), fontWhite, "Name".padEnd(24), "\t", "Samples".padEnd(16));
 
 		for(var gestureName in dataRaw) {
+			nSamples += Object.keys(dataRaw[gestureName]).length;
 			console.log(fontYellow, gestureClassesIndex[gestureName].toString().padEnd(8), fontWhite, gestureName.padEnd(24), "\t", Object.keys(dataRaw[gestureName]).length.toString().padEnd(16));
 		}
 
@@ -158,6 +169,12 @@ function importData(verbose)
 				if(dataRaw[gestureName][s] == undefined) console.log(fontWhite, gestureName + " - " + s);
 			}
 		}
+
+		console.log();
+		console.log(fontYellow, "Number of Users :", fontWhite, nUsers);
+
+		console.log();
+		console.log(fontYellow, "Number of Samples :", fontWhite, nSamples);
 	}
 
 	return dataRaw;

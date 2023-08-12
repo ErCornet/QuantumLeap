@@ -10,6 +10,8 @@ const currentDirectoryParts = currentDirectory.split('backend');
 const backendDirectory = currentDirectoryParts[currentDirectoryParts.length - 2] + "backend";
 const datasetInputDirectory = backendDirectory + "\\src\\datasets\\dynamic\\myo-dataset";
 
+const DELIM = ',';
+
 function exportData(datatype, dataObject) {
 	console.log();
 	console.log(fontYellow, "Exporting Data ", fontWhite, "(", datatype, ")");
@@ -19,10 +21,25 @@ function exportData(datatype, dataObject) {
 
 	let csvHeader = "";
 
-	if(dataObject["calibration"]["1_1"][0].direction != undefined)
-		csvHeader = "Timestamp;Orientation_W;Orientation_X;Orientation_Y;Orientation_Z;Acceleration_X;Acceleration_Y;Acceleration_Z;Rotation_X;Rotation_Y;Rotation_Z;EMG_0;EMG_1;EMG_2;EMG_3;EMG_4;EMG_5;EMG_6;EMG_7;Direction_X;Direction_Y;Direction_Z\n";
-	else
-		csvHeader = "Timestamp;Orientation_W;Orientation_X;Orientation_Y;Orientation_Z;Acceleration_X;Acceleration_Y;Acceleration_Z;Rotation_X;Rotation_Y;Rotation_Z;EMG_0;EMG_1;EMG_2;EMG_3;EMG_4;EMG_5;EMG_6;EMG_7\n";
+	csvHeader = "Timestamp" + DELIM + 
+				"Orientation_W" + DELIM + 
+				"Orientation_X" + DELIM + 
+				"Orientation_Y" + DELIM + 
+				"Orientation_Z" + DELIM + 
+				"Acceleration_X" + DELIM + 
+				"Acceleration_Y" + DELIM + 
+				"Acceleration_Z" + DELIM + 
+				"Rotation_X" + DELIM + 
+				"Rotation_Y" + DELIM + 
+				"Rotation_Z" + DELIM + 
+				"EMG_0" + DELIM + 
+				"EMG_1" + DELIM + 
+				"EMG_2" + DELIM + 
+				"EMG_3" + DELIM + 
+				"EMG_4" + DELIM + 
+				"EMG_5" + DELIM + 
+				"EMG_6" + DELIM + 
+				"EMG_7\n";
 
 	for(var gestureName in dataObject) {
 		const datasetOutputFile = datasetOutputDirectory + "\\" + gestureName + ".json";
@@ -42,34 +59,29 @@ function exportData(datatype, dataObject) {
 			const gesture = dataObject[gestureName][idUserSample]
 
 		    for(let i = 0; i < gesture.length; i++) {
-		    	if(gesture[i].direction != undefined)
-		    	{
-		    		csvContentUserSample += gesture[i].timestamp
-						                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
-						                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
-						                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
-						                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
-						                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
-						                + ";" + gesture[i].direction[0] + ";" + gesture[i].direction[1] + ";" + gesture[i].direction[2] 
-						                + "\n";
-		    	}
-				else
-				{
-			    	csvContentUserSample += gesture[i].timestamp
-						                + ";" + gesture[i].orientation[0] + ";" + gesture[i].orientation[1] + ";" + gesture[i].orientation[2] + ";" + gesture[i].orientation[3]
-						                + ";" + gesture[i].acceleration[0] + ";" + gesture[i].acceleration[1] + ";" + gesture[i].acceleration[2] 
-						                + ";" + gesture[i].rotation[0] + ";" + gesture[i].rotation[1] + ";" + gesture[i].rotation[2] 
-						                + ";" + gesture[i].emg[0] + ";" + gesture[i].emg[1] + ";" + gesture[i].emg[2] + ";" + gesture[i].emg[3] 
-						                + ";" + gesture[i].emg[4] + ";" + gesture[i].emg[5] + ";" + gesture[i].emg[6] + ";" + gesture[i].emg[7] 
-						                + "\n";
-				}
+			    csvContentUserSample += gesture[i].timestamp + DELIM + 
+			    						gesture[i].orientation[0] + DELIM + 
+			    						gesture[i].orientation[1] + DELIM + 
+			    						gesture[i].orientation[2] + DELIM + 
+			    						gesture[i].orientation[3] + DELIM + 
+			    						gesture[i].acceleration[0] + DELIM + 
+			    						gesture[i].acceleration[1] + DELIM + 
+			    						gesture[i].acceleration[2] + DELIM + 
+			    						gesture[i].rotation[0] + DELIM + 
+			    						gesture[i].rotation[1] + DELIM + 
+			    						gesture[i].rotation[2] + DELIM + 
+			    						gesture[i].emg[0] + DELIM + 
+			    						gesture[i].emg[1] + DELIM + 
+			    						gesture[i].emg[2] + DELIM + 
+			    						gesture[i].emg[3] + DELIM + 
+			    						gesture[i].emg[4] + DELIM + 
+			    						gesture[i].emg[5] + DELIM + 
+			    						gesture[i].emg[6] + DELIM + 
+			    						gesture[i].emg[7] + "\n";
 		    }
 
-		    csvContentUserSample = csvContentUserSample.replace(/["."]/g, ",");
 		    csvContent += csvContentUserSample + "\n";
 		    csvContentUserSample = csvHeader + csvContentUserSample;
-
-		    //fs.writeFileSync(analyseOutputFileUserSample, csvContentUserSample, (err) => { if (err) console.error(err); });
 		}
 
 		fs.writeFileSync(analyseOutputFile, csvContent, (err) => { if (err) console.error(err); });

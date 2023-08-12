@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const importData = require('./process-import.js')
 const exportData = require('./process-export.js')
+const exportDataExtended = require('./process-exportExtended.js')
 const filter = require('./process-filter.js')
 const bound = require('./process-bound.js')
 const normalize = require('./process-normalize.js')
@@ -10,6 +11,7 @@ const normalize = require('./process-normalize.js')
 const fontWhite =  "\x1b[37m";
 const fontYellow = "\x1b[33m"
 
+// Import
 console.clear();
 console.log(fontYellow, "Importing Data...", fontWhite);
 let dataRaw = importData(true);
@@ -31,4 +33,4 @@ exportData("bounded", dataBounded);
 console.log();
 console.log(fontYellow, "Normalizing...", fontWhite);
 let dataNormalized = normalize(dataBounded);
-exportData("normalized", dataNormalized);
+exportDataExtended("normalized", dataNormalized);
