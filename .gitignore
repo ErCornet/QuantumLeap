@@ -3,9 +3,3 @@
 node_modules
 backend/node_modules
 frontend/node_modules
-
-backend/src/datasets/dynamic/myo-dataset-raw
-backend/src/datasets/dynamic/myo-dataset-filtered
-backend/src/datasets/dynamic/myo-dataset-bounded
-backend/src/datasets/dynamic/myo-dataset-normalized
-backend/src/datasets/dynamic/myo-dataset-analyse
