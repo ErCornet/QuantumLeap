@@ -3,6 +3,8 @@ const fs = require('fs');
 const contentUD = require("./results-dynamic-UD.json");
 const contentUI = require("./results-dynamic-UI.json");
 
+const nChars = 10;
+
 function compute(type, content)
 {
     const repetitions = content["r"];
@@ -29,11 +31,11 @@ function compute(type, content)
 
         let csvContent = ",";
 
-        for(let i = 0; i < gestures.length; i++) csvContent += gestures[i].substring(0,8) + ",";
+        for(let i = 0; i < gestures.length; i++) csvContent += gestures[i].substring(0, nChars) + ",";
         csvContent += "\n";
 
         for(let i = 0; i < matrix.length; i++) {
-            csvContent += gestures[i].substring(0,8);
+            csvContent += gestures[i].substring(0, nChars);
             for(let j = 0; j < matrix[i].length; j++) {
                 csvContent +=  "," + matrix[i][j];
             }
